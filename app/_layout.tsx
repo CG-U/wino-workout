@@ -8,10 +8,10 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
 
+import { seedDefaultTemplates } from "@/constants/defaultTemplates";
 import { WorkoutProvider } from "@/contexts/WorkoutContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { initializeDatabase } from "@/lib/database/db";
-import { seedDefaultTemplates } from "@/constants/defaultTemplates";
 
 export const unstable_settings = {
   anchor: "(tabs)",

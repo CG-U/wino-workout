@@ -3,12 +3,12 @@
  * Displays a workout template in the list with name, category, and exercise count
  */
 
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Colors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface TemplateCardProps {
   template: WorkoutTemplateWithExercises;
@@ -16,7 +16,11 @@ interface TemplateCardProps {
   onDelete?: () => void;
 }
 
-export function TemplateCard({ template, onPress, onDelete }: TemplateCardProps) {
+export function TemplateCard({
+  template,
+  onPress,
+  onDelete,
+}: TemplateCardProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const colors = Colors[isDark ? "dark" : "light"];
@@ -100,11 +104,19 @@ export function TemplateCard({ template, onPress, onDelete }: TemplateCardProps)
               <Text style={[styles.category, { color: getCategoryColor() }]}>
                 {template.category}
               </Text>
-              <Text style={[styles.separator, { color: isDark ? "#666" : "#999" }]}>
+              <Text
+                style={[styles.separator, { color: isDark ? "#666" : "#999" }]}
+              >
                 •
               </Text>
-              <Text style={[styles.exerciseCount, { color: isDark ? "#999" : "#666" }]}>
-                {template.exercises.length} exercise{template.exercises.length !== 1 ? "s" : ""}
+              <Text
+                style={[
+                  styles.exerciseCount,
+                  { color: isDark ? "#999" : "#666" },
+                ]}
+              >
+                {template.exercises.length} exercise
+                {template.exercises.length !== 1 ? "s" : ""}
               </Text>
             </View>
           </View>

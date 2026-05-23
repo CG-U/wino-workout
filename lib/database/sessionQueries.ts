@@ -149,7 +149,9 @@ export async function getRecentlyUsedTemplates(
 /**
  * Count sessions created from a specific template
  */
-export async function getTemplateUsageCount(templateId: string): Promise<number> {
+export async function getTemplateUsageCount(
+  templateId: string,
+): Promise<number> {
   const db = getDatabase();
 
   const result = await db.getFirstAsync<{ count: number }>(

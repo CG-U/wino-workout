@@ -4,38 +4,34 @@
  * Shows progress, allows logging sets, and can finish or cancel session
  */
 
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ExerciseDetail } from "@/components/Session/ExerciseDetail";
+import { ExerciseNavigator } from "@/components/Session/ExerciseNavigator";
 import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { ExerciseNavigator } from "@/components/Session/ExerciseNavigator";
-import { ExerciseDetail } from "@/components/Session/ExerciseDetail";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useWorkoutOperations } from "@/hooks/useWorkoutOperations";
-import {
-  getWorkoutTemplateWithExercises,
-} from "@/lib/database/templateQueries";
-import {
-  getLastExercisePerformance,
-} from "@/lib/database/sessionQueries";
 import { SessionExercise, SessionSet } from "@/lib/database/schema";
+import { getLastExercisePerformance } from "@/lib/database/sessionQueries";
+import { getWorkoutTemplateWithExercises } from "@/lib/database/templateQueries";
 import * as Crypto from "expo-crypto";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ActiveSessionScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const templateId = params.templateId as string;
-  
+
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -45,7 +41,9 @@ export default function ActiveSessionScreen() {
 
   const [templateName, setTemplateName] = useState("");
   const [exercises, setExercises] = useState<SessionExercise[]>([]);
-  const [currentExerciseId, setCurrentExerciseId] = useState<string | null>(null);
+  const [currentExerciseId, setCurrentExerciseId] = useState<string | null>(
+    null,
+  );
   const [startTime] = useState(Date.now());
 
   useEffect(() => {
@@ -76,7 +74,7 @@ export default function ActiveSessionScreen() {
             sets: [], // Start with no sets, user will add them
             lastPerformance: lastPerformance || undefined,
           };
-        })
+        }),
       );
 
       setExercises(sessionExercises);
@@ -94,19 +92,24 @@ export default function ActiveSessionScreen() {
     setCurrentExerciseId(exerciseId);
   };
 
-  const handleUpdateSet = (exerciseId: string, setId: string, field: "reps" | "weight", value: string) => {
+  const handleUpdateSet = (
+    exerciseId: string,
+    setId: string,
+    field: "reps" | "weight",
+    value: string,
+  ) => {
     setExercises((prev) =>
       prev.map((ex) => {
         if (ex.templateExerciseId === exerciseId) {
           return {
             ...ex,
             sets: ex.sets.map((s) =>
-              s.id === setId ? { ...s, [field]: value } : s
+              s.id === setId ? { ...s, [field]: value } : s,
             ),
           };
         }
         return ex;
-      })
+      }),
     );
   };
 
@@ -125,7 +128,7 @@ export default function ActiveSessionScreen() {
           };
         }
         return ex;
-      })
+      }),
     );
   };
 
@@ -139,14 +142,20 @@ export default function ActiveSessionScreen() {
           };
         }
         return ex;
-      })
+      }),
     );
   };
 
   const handleFinishWorkout = () => {
     // Validate at least one exercise has been logged
     const loggedExercises = exercises.filter((ex) =>
-      ex.sets.some((s) => s.reps && s.weight && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0)
+      ex.sets.some(
+        (s) =>
+          s.reps &&
+          s.weight &&
+          parseFloat(s.weight) > 0 &&
+          parseInt(s.reps) > 0,
+      ),
     );
 
     if (loggedExercises.length === 0) {
@@ -180,7 +189,7 @@ export default function ActiveSessionScreen() {
               }));
 
               await saveWorkout(date, "", exercisesData, templateId);
-              
+
               Alert.alert("Success", "Workout logged successfully!", [
                 {
                   text: "OK",
@@ -198,26 +207,25 @@ export default function ActiveSessionScreen() {
   };
 
   const handleCancelWorkout = () => {
-    Alert.alert(
-      "Cancel Workout",
-      "Are you sure? All progress will be lost.",
-      [
-        { text: "Keep Going", style: "cancel" },
-        {
-          text: "Cancel Workout",
-          style: "destructive",
-          onPress: () => router.replace("/(tabs)/"),
-        },
-      ],
-    );
+    Alert.alert("Cancel Workout", "Are you sure? All progress will be lost.", [
+      { text: "Keep Going", style: "cancel" },
+      {
+        text: "Cancel Workout",
+        style: "destructive",
+        onPress: () => router.replace("/(tabs)/"),
+      },
+    ]);
   };
 
   const currentExercise = exercises.find(
-    (ex) => ex.templateExerciseId === currentExerciseId
+    (ex) => ex.templateExerciseId === currentExerciseId,
   );
 
   const completedExercises = exercises.filter((ex) =>
-    ex.sets.some((s) => s.reps && s.weight && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0)
+    ex.sets.some(
+      (s) =>
+        s.reps && s.weight && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
+    ),
   ).length;
 
   const duration = Math.floor((Date.now() - startTime) / 1000 / 60); // minutes
@@ -237,7 +245,10 @@ export default function ActiveSessionScreen() {
       >
         <View style={styles.headerTop}>
           <View style={styles.headerLeft}>
-            <TouchableOpacity onPress={handleCancelWorkout} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <TouchableOpacity
+              onPress={handleCancelWorkout}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <Text style={[styles.cancelText, { color: "#FF3B30" }]}>
                 Cancel
               </Text>
@@ -247,8 +258,11 @@ export default function ActiveSessionScreen() {
             <Text style={[styles.templateName, { color: colors.text }]}>
               {templateName}
             </Text>
-            <Text style={[styles.progress, { color: isDark ? "#999" : "#666" }]}>
-              {completedExercises} of {exercises.length} exercises • {duration} min
+            <Text
+              style={[styles.progress, { color: isDark ? "#999" : "#666" }]}
+            >
+              {completedExercises} of {exercises.length} exercises • {duration}{" "}
+              min
             </Text>
           </View>
           <View style={styles.headerRight}>
@@ -281,17 +295,33 @@ export default function ActiveSessionScreen() {
               <ExerciseDetail
                 exercise={currentExercise}
                 onUpdateSet={(setId, field, value) =>
-                  handleUpdateSet(currentExercise.templateExerciseId, setId, field, value)
+                  handleUpdateSet(
+                    currentExercise.templateExerciseId,
+                    setId,
+                    field,
+                    value,
+                  )
                 }
-                onAddSet={() => handleAddSet(currentExercise.templateExerciseId)}
+                onAddSet={() =>
+                  handleAddSet(currentExercise.templateExerciseId)
+                }
                 onDeleteSet={(setId) =>
                   handleDeleteSet(currentExercise.templateExerciseId, setId)
                 }
               />
             ) : (
               <View style={styles.emptyState}>
-                <IconSymbol size={64} name="dumbbell" color={isDark ? "#666" : "#999"} />
-                <Text style={[styles.emptyText, { color: isDark ? "#999" : "#666" }]}>
+                <IconSymbol
+                  size={64}
+                  name="dumbbell"
+                  color={isDark ? "#666" : "#999"}
+                />
+                <Text
+                  style={[
+                    styles.emptyText,
+                    { color: isDark ? "#999" : "#666" },
+                  ]}
+                >
                   Select an exercise to begin
                 </Text>
               </View>

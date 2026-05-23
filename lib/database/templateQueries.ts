@@ -6,8 +6,8 @@
 import * as Crypto from "expo-crypto";
 import { getDatabase } from "./db";
 import {
-  WorkoutTemplate,
   TemplateExercise,
+  WorkoutTemplate,
   WorkoutTemplateWithExercises,
 } from "./schema";
 
@@ -79,7 +79,9 @@ export async function getAllWorkoutTemplates(): Promise<WorkoutTemplate[]> {
     is_default: number;
     created_at: number;
     updated_at: number;
-  }>(`SELECT * FROM workout_templates ORDER BY is_default DESC, created_at DESC`);
+  }>(
+    `SELECT * FROM workout_templates ORDER BY is_default DESC, created_at DESC`,
+  );
 
   return rows.map((row) => ({
     id: row.id,

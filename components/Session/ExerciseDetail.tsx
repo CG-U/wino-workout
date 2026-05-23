@@ -3,12 +3,18 @@
  * Set logging interface with previous performance display
  */
 
-import React from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Colors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { SessionExercise } from "@/lib/database/schema";
+import React from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface ExerciseDetailProps {
   exercise: SessionExercise;
@@ -45,15 +51,27 @@ export function ExerciseDetail({
             },
           ]}
         >
-          <IconSymbol size={16} name="chart.line.uptrend.xyaxis" color="#34C759" />
+          <IconSymbol
+            size={16}
+            name="chart.line.uptrend.xyaxis"
+            color="#34C759"
+          />
           <View style={styles.lastPerformanceText}>
             <Text style={[styles.lastPerformanceLabel, { color: "#34C759" }]}>
               Last time:
             </Text>
             <Text style={[styles.lastPerformanceValue, { color: colors.text }]}>
-              {exercise.lastPerformance.sets.map((s) => `${s.reps}×${s.weight}`).join(", ")} kg
+              {exercise.lastPerformance.sets
+                .map((s) => `${s.reps}×${s.weight}`)
+                .join(", ")}{" "}
+              kg
             </Text>
-            <Text style={[styles.lastPerformanceDate, { color: isDark ? "#666" : "#999" }]}>
+            <Text
+              style={[
+                styles.lastPerformanceDate,
+                { color: isDark ? "#666" : "#999" },
+              ]}
+            >
               • {new Date(exercise.lastPerformance.date).toLocaleDateString()}
             </Text>
           </View>
@@ -62,9 +80,15 @@ export function ExerciseDetail({
 
       {/* Sets Table Header */}
       <View style={styles.tableHeader}>
-        <Text style={[styles.tableHeaderText, { color: colors.text }]}>SET</Text>
-        <Text style={[styles.tableHeaderText, { color: colors.text }]}>REPS</Text>
-        <Text style={[styles.tableHeaderText, { color: colors.text }]}>WEIGHT (KG)</Text>
+        <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+          SET
+        </Text>
+        <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+          REPS
+        </Text>
+        <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+          WEIGHT (KG)
+        </Text>
         <View style={styles.tableHeaderSpacer} />
       </View>
 
@@ -146,7 +170,9 @@ export function ExerciseDetail({
       {/* Notes */}
       {exercise.notes && (
         <View style={styles.notesContainer}>
-          <Text style={[styles.notesLabel, { color: isDark ? "#999" : "#666" }]}>
+          <Text
+            style={[styles.notesLabel, { color: isDark ? "#999" : "#666" }]}
+          >
             Notes:
           </Text>
           <Text style={[styles.notesText, { color: colors.text }]}>

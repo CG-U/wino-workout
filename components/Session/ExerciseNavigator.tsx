@@ -4,12 +4,12 @@
  * Visual states: not started (gray), in progress (blue), complete (green)
  */
 
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Colors } from "@/constants/theme";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { SessionExercise } from "@/lib/database/schema";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ExerciseNavigatorProps {
   exercises: SessionExercise[];
@@ -28,9 +28,10 @@ export function ExerciseNavigator({
 
   const getExerciseStatus = (exercise: SessionExercise) => {
     const validSets = exercise.sets.filter(
-      (s) => s.reps && s.weight && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0
+      (s) =>
+        s.reps && s.weight && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
     );
-    
+
     if (validSets.length === 0) return "not-started";
     if (validSets.length < exercise.sets.length) return "in-progress";
     return "complete";
@@ -74,7 +75,9 @@ export function ExerciseNavigator({
               styles.exerciseItem,
               {
                 backgroundColor: isActive
-                  ? (isDark ? "#2a2a2a" : "#f5f5f5")
+                  ? isDark
+                    ? "#2a2a2a"
+                    : "#f5f5f5"
                   : "transparent",
                 borderLeftColor: statusColor,
               },
@@ -91,7 +94,9 @@ export function ExerciseNavigator({
                   style={[
                     styles.exerciseName,
                     { color: colors.text },
-                    status === "not-started" && { color: isDark ? "#666" : "#999" },
+                    status === "not-started" && {
+                      color: isDark ? "#666" : "#999",
+                    },
                   ]}
                 >
                   {exercise.name}

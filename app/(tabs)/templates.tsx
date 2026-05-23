@@ -3,28 +3,28 @@
  * Manage workout templates - view, create, edit, and delete
  */
 
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  RefreshControl,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ThemedView } from "@/components/themed-view";
-import { ThemedText } from "@/components/themed-text";
 import { TemplateCard } from "@/components/Templates/TemplateCard";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import {
-  getAllWorkoutTemplatesWithExercises,
-  deleteWorkoutTemplate,
-} from "@/lib/database/templateQueries";
 import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
+import {
+  deleteWorkoutTemplate,
+  getAllWorkoutTemplatesWithExercises,
+} from "@/lib/database/templateQueries";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TemplatesScreen() {
   const insets = useSafeAreaInsets();
@@ -32,7 +32,9 @@ export default function TemplatesScreen() {
   const isDark = colorScheme === "dark";
   const colors = Colors[isDark ? "dark" : "light"];
 
-  const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>([]);
+  const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -101,7 +103,11 @@ export default function TemplatesScreen() {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <IconSymbol size={64} name="list.bullet" color={isDark ? "#666" : "#999"} />
+      <IconSymbol
+        size={64}
+        name="list.bullet"
+        color={isDark ? "#666" : "#999"}
+      />
       <Text style={[styles.emptyTitle, { color: colors.text }]}>
         No Custom Templates
       </Text>
@@ -136,7 +142,9 @@ export default function TemplatesScreen() {
       {/* Templates List */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <Text style={[styles.loadingText, { color: isDark ? "#999" : "#666" }]}>
+          <Text
+            style={[styles.loadingText, { color: isDark ? "#999" : "#666" }]}
+          >
             Loading templates...
           </Text>
         </View>
@@ -170,7 +178,9 @@ export default function TemplatesScreen() {
             <TemplateCard
               template={item}
               onPress={() => handleTemplatePress(item)}
-              onDelete={!item.isDefault ? () => handleDeleteTemplate(item) : undefined}
+              onDelete={
+                !item.isDefault ? () => handleDeleteTemplate(item) : undefined
+              }
             />
           )}
           keyExtractor={(item) => item.id}

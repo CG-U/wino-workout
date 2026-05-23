@@ -143,7 +143,7 @@ async function runMigrations(database: SQLite.SQLiteDatabase): Promise<void> {
     if (!result) {
       console.log("🔄 Running initial migration...");
       await database.execAsync(MIGRATION_1);
-      
+
       // Record migration 1
       await database.runAsync(
         "INSERT INTO _prisma_migrations (id, version, name, executedAt) VALUES (?, ?, ?, ?)",
@@ -162,7 +162,7 @@ async function runMigrations(database: SQLite.SQLiteDatabase): Promise<void> {
     if (!migration2) {
       console.log("🔄 Running templates migration...");
       await database.execAsync(MIGRATION_2);
-      
+
       // Record migration 2
       await database.runAsync(
         "INSERT INTO _prisma_migrations (id, version, name, executedAt) VALUES (?, ?, ?, ?)",

@@ -3,20 +3,20 @@
  * Modal for selecting a workout template to start a session
  */
 
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
 import React, { useState } from "react";
 import {
-  Modal,
-  View,
-  Text,
   FlatList,
-  TouchableOpacity,
+  Modal,
   StyleSheet,
+  Text,
   TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { Colors } from "@/constants/theme";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
 
 interface TemplatePickerModalProps {
   visible: boolean;
@@ -37,9 +37,10 @@ export function TemplatePickerModal({
 
   const [searchText, setSearchText] = useState("");
 
-  const filteredTemplates = templates.filter((template) =>
-    template.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    template.category.toLowerCase().includes(searchText.toLowerCase())
+  const filteredTemplates = templates.filter(
+    (template) =>
+      template.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      template.category.toLowerCase().includes(searchText.toLowerCase()),
   );
 
   const handleSelect = (template: WorkoutTemplateWithExercises) => {
@@ -92,7 +93,11 @@ export function TemplatePickerModal({
                 onPress={onClose}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <IconSymbol size={24} name="chevron.right" color={colors.text} />
+                <IconSymbol
+                  size={24}
+                  name="chevron.right"
+                  color={colors.text}
+                />
               </TouchableOpacity>
             </View>
 
@@ -116,7 +121,9 @@ export function TemplatePickerModal({
           {/* Template List */}
           {filteredTemplates.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={[styles.emptyText, { color: isDark ? "#999" : "#666" }]}>
+              <Text
+                style={[styles.emptyText, { color: isDark ? "#999" : "#666" }]}
+              >
                 No matching templates
               </Text>
             </View>
@@ -147,7 +154,12 @@ export function TemplatePickerModal({
                       >
                         {template.category}
                       </Text>
-                      <Text style={[styles.separator, { color: isDark ? "#666" : "#999" }]}>
+                      <Text
+                        style={[
+                          styles.separator,
+                          { color: isDark ? "#666" : "#999" },
+                        ]}
+                      >
                         •
                       </Text>
                       <Text
@@ -160,7 +172,11 @@ export function TemplatePickerModal({
                       </Text>
                     </View>
                   </View>
-                  <IconSymbol size={20} name="chevron.right" color={colors.tint} />
+                  <IconSymbol
+                    size={20}
+                    name="chevron.right"
+                    color={colors.tint}
+                  />
                 </TouchableOpacity>
               )}
               keyExtractor={(item) => item.id}

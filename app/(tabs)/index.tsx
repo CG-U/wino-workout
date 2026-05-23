@@ -3,30 +3,26 @@
  * Quick start workout, recently used templates, and stats overview
  */
 
+import { TemplatePickerModal } from "@/components/Templates/TemplatePickerModal";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { Colors } from "@/constants/theme";
+import { useWorkout } from "@/contexts/WorkoutContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
+import { getRecentlyUsedTemplates } from "@/lib/database/sessionQueries";
+import { getAllWorkoutTemplatesWithExercises } from "@/lib/database/templateQueries";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  View,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ThemedView } from "@/components/themed-view";
-import { ThemedText } from "@/components/themed-text";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { TemplatePickerModal } from "@/components/Templates/TemplatePickerModal";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useWorkout } from "@/contexts/WorkoutContext";
-import {
-  getAllWorkoutTemplatesWithExercises,
-} from "@/lib/database/templateQueries";
-import {
-  getRecentlyUsedTemplates,
-} from "@/lib/database/sessionQueries";
-import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -36,7 +32,9 @@ export default function HomeScreen() {
   const colors = Colors[isDark ? "dark" : "light"];
   const { workouts } = useWorkout();
 
-  const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>([]);
+  const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>(
+    [],
+  );
   const [recentTemplates, setRecentTemplates] = useState<
     { templateId: string; templateName: string; lastUsed: string }[]
   >([]);
@@ -81,13 +79,16 @@ export default function HomeScreen() {
 
   // Calculate quick stats
   const totalWorkouts = workouts.length;
-  const lastWorkoutDate = workouts.length > 0
-    ? new Date(workouts[0].date).toLocaleDateString()
-    : "Never";
+  const lastWorkoutDate =
+    workouts.length > 0
+      ? new Date(workouts[0].date).toLocaleDateString()
+      : "Never";
 
   // Calculate current week volume
   const currentWeekStart = new Date();
-  currentWeekStart.setDate(currentWeekStart.getDate() - currentWeekStart.getDay());
+  currentWeekStart.setDate(
+    currentWeekStart.getDate() - currentWeekStart.getDay(),
+  );
   currentWeekStart.setHours(0, 0, 0, 0);
 
   const weekVolume = workouts
@@ -140,7 +141,9 @@ export default function HomeScreen() {
               <Text style={[styles.statValue, { color: colors.text }]}>
                 {totalWorkouts}
               </Text>
-              <Text style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}>
+              <Text
+                style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}
+              >
                 Total Workouts
               </Text>
             </View>
@@ -158,7 +161,9 @@ export default function HomeScreen() {
               <Text style={[styles.statValue, { color: colors.text }]}>
                 {lastWorkoutDate}
               </Text>
-              <Text style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}>
+              <Text
+                style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}
+              >
                 Last Workout
               </Text>
             </View>
@@ -176,7 +181,9 @@ export default function HomeScreen() {
               <Text style={[styles.statValue, { color: colors.text }]}>
                 {weekVolume.toFixed(0)} kg
               </Text>
-              <Text style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}>
+              <Text
+                style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}
+              >
                 This Week
               </Text>
             </View>
@@ -199,7 +206,9 @@ export default function HomeScreen() {
                     borderColor: colors.border,
                   },
                 ]}
-                onPress={() => handleQuickStart(item.templateId, item.templateName)}
+                onPress={() =>
+                  handleQuickStart(item.templateId, item.templateName)
+                }
                 activeOpacity={0.7}
               >
                 <View style={styles.recentCardContent}>
@@ -216,13 +225,20 @@ export default function HomeScreen() {
                       {item.templateName}
                     </Text>
                     <Text
-                      style={[styles.recentDate, { color: isDark ? "#999" : "#666" }]}
+                      style={[
+                        styles.recentDate,
+                        { color: isDark ? "#999" : "#666" },
+                      ]}
                     >
                       Last used: {new Date(item.lastUsed).toLocaleDateString()}
                     </Text>
                   </View>
                 </View>
-                <IconSymbol size={20} name="chevron.right" color={colors.icon} />
+                <IconSymbol
+                  size={20}
+                  name="chevron.right"
+                  color={colors.icon}
+                />
               </TouchableOpacity>
             ))}
           </View>
@@ -231,11 +247,20 @@ export default function HomeScreen() {
         {/* Empty State for First Time Users */}
         {totalWorkouts === 0 && (
           <View style={styles.emptyState}>
-            <IconSymbol size={64} name="dumbbell" color={isDark ? "#666" : "#999"} />
+            <IconSymbol
+              size={64}
+              name="dumbbell"
+              color={isDark ? "#666" : "#999"}
+            />
             <Text style={[styles.emptyTitle, { color: colors.text }]}>
               Welcome to Wino Workout!
             </Text>
-            <Text style={[styles.emptySubtitle, { color: isDark ? "#999" : "#666" }]}>
+            <Text
+              style={[
+                styles.emptySubtitle,
+                { color: isDark ? "#999" : "#666" },
+              ]}
+            >
               Tap &quot;Start Workout&quot; above to begin your fitness journey.
               We&apos;ve got {templates.length} templates ready for you!
             </Text>

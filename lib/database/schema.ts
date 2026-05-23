@@ -36,7 +36,7 @@ export interface Set {
 export interface WorkoutTemplate {
   id: string;
   name: string;
-  category: 'PPL' | 'Bro Split' | 'Full Body' | 'Custom';
+  category: "PPL" | "Bro Split" | "Full Body" | "Custom";
   notes: string;
   isDefault: boolean; // True for pre-installed templates
   createdAt: number;

@@ -65,9 +65,8 @@ export default function WorkoutsScreen() {
 
             try {
               // Import template creation functions
-              const { createCompleteTemplate } = await import(
-                "@/lib/database/templateQueries"
-              );
+              const { createCompleteTemplate } =
+                await import("@/lib/database/templateQueries");
 
               // Create template from workout exercises
               const templateExercises = workout.exercises.map((ex) => ({
@@ -152,12 +151,7 @@ export default function WorkoutsScreen() {
         <View style={styles.cardContent}>
           <View style={styles.dateSection}>
             {workout.templateName && (
-              <Text
-                style={[
-                  styles.templateName,
-                  { color: colors.tint },
-                ]}
-              >
+              <Text style={[styles.templateName, { color: colors.tint }]}>
                 {workout.templateName}
               </Text>
             )}
@@ -179,7 +173,11 @@ export default function WorkoutsScreen() {
               style={styles.actionButton}
               onPress={() => handleUseAsTemplate(workout)}
             >
-              <IconSymbol size={20} name="plus.circle.fill" color={colors.tint} />
+              <IconSymbol
+                size={20}
+                name="plus.circle.fill"
+                color={colors.tint}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionButton}

@@ -160,9 +160,8 @@ export async function seedDefaultTemplates(): Promise<void> {
     console.log("🌱 Checking for default templates...");
 
     // Check if defaults already exist (check for any template with is_default = 1)
-    const { getAllWorkoutTemplates } = await import(
-      "../lib/database/templateQueries"
-    );
+    const { getAllWorkoutTemplates } =
+      await import("../lib/database/templateQueries");
     const existing = await getAllWorkoutTemplates();
     const hasDefaults = existing.some((t) => t.isDefault);
 
