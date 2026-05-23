@@ -55,6 +55,42 @@ CREATE INDEX IF NOT EXISTS idx_sets_exercise_id ON sets(exercise_id);
 CREATE INDEX IF NOT EXISTS idx_workouts_date ON workouts(date);
 `;
 
+const MIGRATION_2 = `
+-- Migration 002: Workout Templates
+-- Create tables for workout templates and template exercises
+-- Add template_id reference to workouts table
+
+-- Create workout_templates table
+CREATE TABLE IF NOT EXISTS workout_templates (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  category TEXT NOT NULL CHECK(category IN ('PPL', 'Bro Split', 'Full Body', 'Custom')),
+  notes TEXT DEFAULT '',
+  is_default INTEGER DEFAULT 0 CHECK(is_default IN (0, 1)),
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+
+-- Create template_exercises table
+CREATE TABLE IF NOT EXISTS template_exercises (
+  id TEXT PRIMARY KEY,
+  template_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  notes TEXT DEFAULT '',
+  "order" INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (template_id) REFERENCES workout_templates(id) ON DELETE CASCADE
+);
+
+-- Add template_id column to workouts table (nullable for backwards compatibility)
+ALTER TABLE workouts ADD COLUMN template_id TEXT REFERENCES workout_templates(id) ON DELETE SET NULL;
+
+-- Create indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_template_exercises_template_id ON template_exercises(template_id);
+CREATE INDEX IF NOT EXISTS idx_workouts_template_id ON workouts(template_id);
+CREATE INDEX IF NOT EXISTS idx_workout_templates_category ON workout_templates(category);
+`;
+
 /**
  * Initialize the database
  * Runs migrations if needed
@@ -107,10 +143,32 @@ async function runMigrations(database: SQLite.SQLiteDatabase): Promise<void> {
     if (!result) {
       console.log("🔄 Running initial migration...");
       await database.execAsync(MIGRATION_1);
-      console.log("✅ Initial migration completed");
+      
+      // Record migration 1
+      await database.runAsync(
+        "INSERT INTO _prisma_migrations (id, version, name, executedAt) VALUES (?, ?, ?, ?)",
+        ["migration_001", 1, "001_initial_schema", Date.now()],
+      );
+      console.log("✅ Migration 1 completed");
     } else {
-      // Future: check which migrations have been run and run pending ones
       console.log("✅ Migrations table exists");
+    }
+
+    // Check if migration 2 has been run
+    const migration2 = await database.getFirstAsync<{ version: number }>(
+      "SELECT version FROM _prisma_migrations WHERE version = 2",
+    );
+
+    if (!migration2) {
+      console.log("🔄 Running templates migration...");
+      await database.execAsync(MIGRATION_2);
+      
+      // Record migration 2
+      await database.runAsync(
+        "INSERT INTO _prisma_migrations (id, version, name, executedAt) VALUES (?, ?, ?, ?)",
+        ["migration_002", 2, "002_templates", Date.now()],
+      );
+      console.log("✅ Migration 2 completed");
     }
   } catch (error) {
     console.error("❌ Migration error:", error);
@@ -146,6 +204,8 @@ export async function resetDatabase(): Promise<void> {
       DROP TABLE IF EXISTS sets;
       DROP TABLE IF EXISTS exercises;
       DROP TABLE IF EXISTS workouts;
+      DROP TABLE IF EXISTS template_exercises;
+      DROP TABLE IF EXISTS workout_templates;
       DROP TABLE IF EXISTS _prisma_migrations;
     `);
 

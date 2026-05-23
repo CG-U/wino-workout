@@ -27,20 +27,20 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="log-workout"
+        name="templates"
         options={{
-          title: "Log",
+          title: "Templates",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="plus.circle.fill" color={color} />
+            <IconSymbol size={28} name="list.bullet" color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="workouts"
         options={{
-          title: "Workouts",
+          title: "History",
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="list.bullet" color={color} />
+            <IconSymbol size={28} name="calendar" color={color} />
           ),
         }}
       />

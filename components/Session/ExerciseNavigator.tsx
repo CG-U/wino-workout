@@ -1,0 +1,144 @@
+/**
+ * Exercise Navigator Component
+ * Free navigation list showing all exercises in the active session
+ * Visual states: not started (gray), in progress (blue), complete (green)
+ */
+
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Colors } from "@/constants/theme";
+import { IconSymbol } from "@/components/ui/icon-symbol";
+import { SessionExercise } from "@/lib/database/schema";
+
+interface ExerciseNavigatorProps {
+  exercises: SessionExercise[];
+  currentExerciseId: string | null;
+  onSelectExercise: (exerciseId: string) => void;
+}
+
+export function ExerciseNavigator({
+  exercises,
+  currentExerciseId,
+  onSelectExercise,
+}: ExerciseNavigatorProps) {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const colors = Colors[isDark ? "dark" : "light"];
+
+  const getExerciseStatus = (exercise: SessionExercise) => {
+    const validSets = exercise.sets.filter(
+      (s) => s.reps && s.weight && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0
+    );
+    
+    if (validSets.length === 0) return "not-started";
+    if (validSets.length < exercise.sets.length) return "in-progress";
+    return "complete";
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "not-started":
+        return isDark ? "#666" : "#999";
+      case "in-progress":
+        return "#007AFF";
+      case "complete":
+        return "#34C759";
+      default:
+        return colors.text;
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "complete":
+        return "checkmark.circle.fill";
+      case "in-progress":
+        return "circle.lefthalf.fill";
+      default:
+        return "circle";
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      {exercises.map((exercise, index) => {
+        const status = getExerciseStatus(exercise);
+        const statusColor = getStatusColor(status);
+        const isActive = currentExerciseId === exercise.templateExerciseId;
+
+        return (
+          <TouchableOpacity
+            key={exercise.templateExerciseId}
+            style={[
+              styles.exerciseItem,
+              {
+                backgroundColor: isActive
+                  ? (isDark ? "#2a2a2a" : "#f5f5f5")
+                  : "transparent",
+                borderLeftColor: statusColor,
+              },
+            ]}
+            onPress={() => onSelectExercise(exercise.templateExerciseId)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.exerciseContent}>
+              <View style={styles.exerciseInfo}>
+                <Text style={[styles.exerciseNumber, { color: statusColor }]}>
+                  {index + 1}
+                </Text>
+                <Text
+                  style={[
+                    styles.exerciseName,
+                    { color: colors.text },
+                    status === "not-started" && { color: isDark ? "#666" : "#999" },
+                  ]}
+                >
+                  {exercise.name}
+                </Text>
+              </View>
+              <IconSymbol
+                size={20}
+                name={getStatusIcon(status)}
+                color={statusColor}
+              />
+            </View>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    gap: 2,
+  },
+  exerciseItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderLeftWidth: 4,
+    borderRadius: 8,
+  },
+  exerciseContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  exerciseInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  exerciseNumber: {
+    fontSize: 14,
+    fontWeight: "700",
+    marginRight: 12,
+    width: 24,
+  },
+  exerciseName: {
+    fontSize: 15,
+    fontWeight: "500",
+    flex: 1,
+  },
+});

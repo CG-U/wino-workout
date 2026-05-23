@@ -32,6 +32,7 @@ export function useWorkoutOperations() {
       notes?: string;
       sets: Array<{ reps: number; weight: number }>;
     }>,
+    templateId?: string | null,
   ) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
@@ -39,6 +40,7 @@ export function useWorkoutOperations() {
         date,
         notes,
         exercisesData,
+        templateId,
       );
       dispatch({ type: "ADD_WORKOUT", payload: workout });
       dispatch({ type: "SET_LOADING", payload: false });

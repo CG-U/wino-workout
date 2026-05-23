@@ -49,6 +49,55 @@ export default function WorkoutsScreen() {
     }
   };
 
+  const handleUseAsTemplate = (workout: WorkoutWithExercises) => {
+    Alert.prompt(
+      "Create Template",
+      "Enter a name for this template:",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Create",
+          onPress: async (templateName) => {
+            if (!templateName || templateName.trim() === "") {
+              Alert.alert("Error", "Template name cannot be empty");
+              return;
+            }
+
+            try {
+              // Import template creation functions
+              const { createCompleteTemplate } = await import(
+                "@/lib/database/templateQueries"
+              );
+
+              // Create template from workout exercises
+              const templateExercises = workout.exercises.map((ex) => ({
+                name: ex.name,
+                notes: ex.notes || "",
+              }));
+
+              await createCompleteTemplate(
+                templateName.trim(),
+                "Custom",
+                "",
+                false,
+                templateExercises,
+              );
+
+              Alert.alert(
+                "Success",
+                `Template "${templateName}" created successfully!`,
+              );
+            } catch (error) {
+              console.error("Error creating template:", error);
+              Alert.alert("Error", "Failed to create template");
+            }
+          },
+        },
+      ],
+      "plain-text",
+    );
+  };
+
   const handleDeleteWorkout = (workout: WorkoutWithExercises) => {
     Alert.alert(
       "Delete Workout?",
@@ -102,6 +151,16 @@ export default function WorkoutsScreen() {
         {/* Date and summary */}
         <View style={styles.cardContent}>
           <View style={styles.dateSection}>
+            {workout.templateName && (
+              <Text
+                style={[
+                  styles.templateName,
+                  { color: colors.tint },
+                ]}
+              >
+                {workout.templateName}
+              </Text>
+            )}
             <Text style={[styles.date, { color: colors.text }]}>
               {formattedDate}
             </Text>
@@ -117,7 +176,13 @@ export default function WorkoutsScreen() {
           {/* Action buttons */}
           <View style={styles.actionButtons}>
             <TouchableOpacity
-              style={styles.deleteButton}
+              style={styles.actionButton}
+              onPress={() => handleUseAsTemplate(workout)}
+            >
+              <IconSymbol size={20} name="plus.circle.fill" color={colors.tint} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.actionButton}
               onPress={() => handleDeleteWorkout(workout)}
             >
               <IconSymbol size={20} name="trash" color="#FF3B30" />
@@ -254,6 +319,11 @@ const styles = StyleSheet.create({
   dateSection: {
     flex: 1,
   },
+  templateName: {
+    fontSize: 14,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
   date: {
     fontSize: 16,
     fontWeight: "600",
@@ -266,7 +336,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
   },
-  deleteButton: {
+  actionButton: {
     padding: 8,
   },
   exercisesSection: {

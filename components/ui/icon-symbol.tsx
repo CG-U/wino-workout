@@ -28,7 +28,12 @@ const MAPPING = {
   "chart.line.uptrend.xyaxis": "trending-up",
   flame: "whatshot",
   "figure.walk": "directions-walk",
+  "figure.strengthtraining.traditional": "fitness-center",
+  calendar: "event",
   trash: "delete",
+  "checkmark.circle.fill": "check-circle",
+  "circle.lefthalf.fill": "lens",
+  circle: "radio-button-unchecked",
 } as IconMapping;
 
 /**

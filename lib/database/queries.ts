@@ -20,25 +20,26 @@ import {
 export async function createWorkout(
   date: string,
   notes: string = "",
+  templateId?: string | null,
 ): Promise<Workout> {
   const db = getDatabase();
   const id = Crypto.randomUUID();
   const now = Date.now();
 
   await db.runAsync(
-    `INSERT INTO workouts (id, date, notes, created_at, updated_at) 
-     VALUES (?, ?, ?, ?, ?)`,
-    [id, date, notes, now, now],
+    `INSERT INTO workouts (id, date, notes, template_id, created_at, updated_at) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [id, date, notes, templateId || null, now, now],
   );
 
-  return { id, date, notes, createdAt: now, updatedAt: now };
+  return { id, date, notes, templateId, createdAt: now, updatedAt: now };
 }
 
 export async function getWorkout(id: string): Promise<Workout | null> {
   const db = getDatabase();
   const result = await db.getFirstAsync<Workout>(
     `SELECT 
-      id, date, notes, created_at as createdAt, updated_at as updatedAt
+      id, date, notes, template_id as templateId, created_at as createdAt, updated_at as updatedAt
      FROM workouts WHERE id = ?`,
     [id],
   );
@@ -48,7 +49,7 @@ export async function getWorkout(id: string): Promise<Workout | null> {
 export async function getAllWorkouts(): Promise<Workout[]> {
   const db = getDatabase();
   const results = await db.getAllAsync<Workout>(
-    `SELECT id, date, notes, created_at as createdAt, updated_at as updatedAt
+    `SELECT id, date, notes, template_id as templateId, created_at as createdAt, updated_at as updatedAt
      FROM workouts ORDER BY date DESC`,
   );
   return results || [];
@@ -306,6 +307,17 @@ export async function getWorkoutWithExercises(
   const workout = await getWorkout(id);
   if (!workout) return null;
 
+  // Fetch template name if workout has template_id
+  let templateName: string | null = null;
+  if (workout.templateId) {
+    const db = getDatabase();
+    const templateResult = await db.getFirstAsync<{ name: string }>(
+      `SELECT name FROM workout_templates WHERE id = ?`,
+      [workout.templateId],
+    );
+    templateName = templateResult?.name || null;
+  }
+
   const exercises = await getExercisesByWorkout(id);
   const exercisesWithSets: ExerciseWithSets[] = [];
   let totalVolume = 0;
@@ -332,6 +344,7 @@ export async function getWorkoutWithExercises(
     exercises: exercisesWithSets,
     totalVolume,
     exerciseCount: exercises.length,
+    templateName,
   };
 }
 
@@ -366,6 +379,7 @@ export async function createCompleteWorkout(
     notes?: string;
     sets: Array<{ reps: number; weight: number }>;
   }>,
+  templateId?: string | null,
 ): Promise<WorkoutWithExercises> {
   const db = getDatabase();
 
@@ -374,7 +388,7 @@ export async function createCompleteWorkout(
     await db.execAsync("BEGIN TRANSACTION");
 
     // Create workout
-    const workout = await createWorkout(date, notes);
+    const workout = await createWorkout(date, notes, templateId);
 
     // Create exercises and sets
     const exercisesWithSets: ExerciseWithSets[] = [];
@@ -418,11 +432,22 @@ export async function createCompleteWorkout(
     // Commit transaction
     await db.execAsync("COMMIT");
 
+    // Fetch template name if workout has template_id
+    let templateName: string | null = null;
+    if (workout.templateId) {
+      const templateResult = await db.getFirstAsync<{ name: string }>(
+        `SELECT name FROM workout_templates WHERE id = ?`,
+        [workout.templateId],
+      );
+      templateName = templateResult?.name || null;
+    }
+
     return {
       ...workout,
       exercises: exercisesWithSets,
       totalVolume,
       exerciseCount: exercisesWithSets.length,
+      templateName,
     };
   } catch (error) {
     // Rollback transaction on error

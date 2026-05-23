@@ -11,6 +11,7 @@ import "react-native-reanimated";
 import { WorkoutProvider } from "@/contexts/WorkoutContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { initializeDatabase } from "@/lib/database/db";
+import { seedDefaultTemplates } from "@/constants/defaultTemplates";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -24,6 +25,7 @@ export default function RootLayout() {
     const initDb = async () => {
       try {
         await initializeDatabase();
+        await seedDefaultTemplates(); // Seed default templates on first launch
         setDbReady(true);
       } catch (error) {
         console.error("Failed to initialize database:", error);
