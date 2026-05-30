@@ -4,8 +4,8 @@
  */
 
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { StandardView } from "@/components/ui/standard-view";
 import { Colors } from "@/constants/theme";
 import { useWorkout } from "@/contexts/WorkoutContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -67,7 +67,7 @@ export default function DashboardScreen() {
   );
 
   return (
-    <ThemedView style={styles.container}>
+    <StandardView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
@@ -352,7 +352,7 @@ export default function DashboardScreen() {
           </>
         )}
       </ScrollView>
-    </ThemedView>
+    </StandardView>
   );
 }
 
@@ -364,7 +364,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
     paddingBottom: 12,
   },
   subtitle: {
@@ -391,7 +390,6 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingHorizontal: 16,
     gap: 12,
     marginBottom: 12,
   },
@@ -423,7 +421,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   section: {
-    paddingHorizontal: 16,
     marginVertical: 12,
   },
   sectionTitle: {

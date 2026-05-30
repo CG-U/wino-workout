@@ -135,11 +135,11 @@ export async function createExercise(
 export async function getExercise(id: string): Promise<Exercise | null> {
   const db = getDatabase();
   const result = await db.getFirstAsync<Exercise>(
-    `SELECT id, workout_id as workoutId, name, notes, "order" as order, created_at as createdAt, updated_at as updatedAt
+    `SELECT id, workout_id as workoutId, name, notes, "order" as sortOrder, created_at as createdAt, updated_at as updatedAt
      FROM exercises WHERE id = ?`,
     [id],
   );
-  return result || null;
+  return result ? { ...result, order: result.sortOrder } : null;
 }
 
 export async function getExercisesByWorkout(
@@ -147,11 +147,11 @@ export async function getExercisesByWorkout(
 ): Promise<Exercise[]> {
   const db = getDatabase();
   const results = await db.getAllAsync<Exercise>(
-    `SELECT id, workout_id as workoutId, name, notes, "order" as order, created_at as createdAt, updated_at as updatedAt
+    `SELECT id, workout_id as workoutId, name, notes, "order" as sortOrder, created_at as createdAt, updated_at as updatedAt
      FROM exercises WHERE workout_id = ? ORDER BY "order" ASC`,
     [workoutId],
   );
-  return results || [];
+  return results ? results.map((r) => ({ ...r, order: r.sortOrder })) : [];
 }
 
 export async function updateExercise(
@@ -234,21 +234,21 @@ export async function createSet(
 export async function getSet(id: string): Promise<Set | null> {
   const db = getDatabase();
   const result = await db.getFirstAsync<Set>(
-    `SELECT id, exercise_id as exerciseId, reps, weight, "order" as order, created_at as createdAt, updated_at as updatedAt
+    `SELECT id, exercise_id as exerciseId, reps, weight, "order" as sortOrder, created_at as createdAt, updated_at as updatedAt
      FROM sets WHERE id = ?`,
     [id],
   );
-  return result || null;
+  return result ? { ...result, order: result.sortOrder } : null;
 }
 
 export async function getSetsByExercise(exerciseId: string): Promise<Set[]> {
   const db = getDatabase();
   const results = await db.getAllAsync<Set>(
-    `SELECT id, exercise_id as exerciseId, reps, weight, "order" as order, created_at as createdAt, updated_at as updatedAt
+    `SELECT id, exercise_id as exerciseId, reps, weight, "order" as sortOrder, created_at as createdAt, updated_at as updatedAt
      FROM sets WHERE exercise_id = ? ORDER BY "order" ASC`,
     [exerciseId],
   );
-  return results || [];
+  return results ? results.map((r) => ({ ...r, order: r.sortOrder })) : [];
 }
 
 export async function updateSet(

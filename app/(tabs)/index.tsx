@@ -5,23 +5,25 @@
 
 import { TemplatePickerModal } from "@/components/Templates/TemplatePickerModal";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { CardButton, PrimaryButton } from "@/components/ui/button";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { StandardView } from "@/components/ui/standard-view";
 import { Colors } from "@/constants/theme";
 import { useWorkout } from "@/contexts/WorkoutContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
-import { getRecentlyUsedTemplates } from "@/lib/database/sessionQueries";
+import {
+  ActiveSession,
+  SessionExercise,
+  WorkoutTemplateWithExercises,
+} from "@/lib/database/schema";
+import {
+  getLastExercisePerformance,
+  getRecentlyUsedTemplates,
+} from "@/lib/database/sessionQueries";
 import { getAllWorkoutTemplatesWithExercises } from "@/lib/database/templateQueries";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
@@ -30,7 +32,7 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const colors = Colors[isDark ? "dark" : "light"];
-  const { workouts } = useWorkout();
+  const { workouts, dispatch } = useWorkout();
 
   const [templates, setTemplates] = useState<WorkoutTemplateWithExercises[]>(
     [],
@@ -61,13 +63,45 @@ export default function HomeScreen() {
     setShowTemplatePicker(true);
   };
 
-  const handleTemplateSelect = (template: WorkoutTemplateWithExercises) => {
+  const handleTemplateSelect = async (
+    template: WorkoutTemplateWithExercises,
+  ) => {
     setShowTemplatePicker(false);
-    // Navigate to active session screen
-    router.push({
-      pathname: "/active-session",
-      params: { templateId: template.id },
-    });
+
+    try {
+      // Initialize session exercises with previous performance
+      const sessionExercises: SessionExercise[] = await Promise.all(
+        template.exercises.map(async (te) => {
+          const lastPerformance = await getLastExercisePerformance(te.name);
+          return {
+            templateExerciseId: te.id,
+            name: te.name,
+            notes: te.notes,
+            order: te.order,
+            sets: [],
+            lastPerformance: lastPerformance || undefined,
+          };
+        }),
+      );
+
+      // Create active session
+      const session: ActiveSession = {
+        templateId: template.id,
+        templateName: template.name,
+        startedAt: Date.now(),
+        date: new Date().toISOString().split("T")[0],
+        notes: "",
+        exercises: sessionExercises,
+      };
+
+      // Dispatch START_SESSION
+      dispatch({ type: "START_SESSION", payload: session });
+
+      // Navigate to session tab
+      router.push("/(tabs)/session");
+    } catch (error) {
+      console.error("Error starting session:", error);
+    }
   };
 
   const handleQuickStart = (templateId: string, templateName: string) => {
@@ -96,7 +130,7 @@ export default function HomeScreen() {
     .reduce((sum, w) => sum + (w.totalVolume || 0), 0);
 
   return (
-    <ThemedView style={styles.container}>
+    <StandardView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -113,14 +147,12 @@ export default function HomeScreen() {
         </View>
 
         {/* Start Workout Button */}
-        <TouchableOpacity
-          style={[styles.startButton, { backgroundColor: colors.tint }]}
+        <PrimaryButton
+          title="Start Workout"
+          icon="plus.circle.fill"
           onPress={handleStartWorkout}
-          activeOpacity={0.8}
-        >
-          <IconSymbol size={32} name="plus.circle.fill" color="#fff" />
-          <Text style={styles.startButtonText}>Start Workout</Text>
-        </TouchableOpacity>
+          style={styles.startButton}
+        />
 
         {/* Quick Stats */}
         <View style={styles.statsSection}>
@@ -197,49 +229,15 @@ export default function HomeScreen() {
               Recently Used
             </Text>
             {recentTemplates.map((item) => (
-              <TouchableOpacity
+              <CardButton
                 key={item.templateId}
-                style={[
-                  styles.recentCard,
-                  {
-                    backgroundColor: isDark ? "#1a1a1a" : "#fff",
-                    borderColor: colors.border,
-                  },
-                ]}
+                title={item.templateName}
+                subtitle={`Last used: ${new Date(item.lastUsed).toLocaleDateString()}`}
+                icon="dumbbell"
                 onPress={() =>
                   handleQuickStart(item.templateId, item.templateName)
                 }
-                activeOpacity={0.7}
-              >
-                <View style={styles.recentCardContent}>
-                  <View
-                    style={[
-                      styles.recentIcon,
-                      { backgroundColor: colors.tint + "20" },
-                    ]}
-                  >
-                    <IconSymbol size={24} name="dumbbell" color={colors.tint} />
-                  </View>
-                  <View style={styles.recentInfo}>
-                    <Text style={[styles.recentName, { color: colors.text }]}>
-                      {item.templateName}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.recentDate,
-                        { color: isDark ? "#999" : "#666" },
-                      ]}
-                    >
-                      Last used: {new Date(item.lastUsed).toLocaleDateString()}
-                    </Text>
-                  </View>
-                </View>
-                <IconSymbol
-                  size={20}
-                  name="chevron.right"
-                  color={colors.icon}
-                />
-              </TouchableOpacity>
+              />
             ))}
           </View>
         )}
@@ -275,7 +273,7 @@ export default function HomeScreen() {
         onSelect={handleTemplateSelect}
         onClose={() => setShowTemplatePicker(false)}
       />
-    </ThemedView>
+    </StandardView>
   );
 }
 
@@ -287,7 +285,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
+    // Horizontal padding is provided by StandardView
   },
   header: {
     marginBottom: 24,
@@ -297,23 +295,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   startButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    paddingVertical: 18,
-    borderRadius: 16,
     marginBottom: 32,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  startButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "700",
   },
   statsSection: {
     marginBottom: 32,
@@ -346,39 +328,6 @@ const styles = StyleSheet.create({
   },
   recentSection: {
     marginBottom: 32,
-  },
-  recentCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  recentCardContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  recentIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  recentInfo: {
-    flex: 1,
-  },
-  recentName: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 2,
-  },
-  recentDate: {
-    fontSize: 13,
   },
   emptyState: {
     alignItems: "center",

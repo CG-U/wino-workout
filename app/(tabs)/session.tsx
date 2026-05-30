@@ -1,21 +1,20 @@
 /**
- * Active Session Screen
- * Active workout session with free navigation between exercises
- * Shows progress, allows logging sets, and can finish or cancel session
+ * Session Tab Screen
+ * Shows the active workout session or empty state
  */
 
 import { ExerciseDetail } from "@/components/Session/ExerciseDetail";
 import { ExerciseNavigator } from "@/components/Session/ExerciseNavigator";
-import { ThemedView } from "@/components/themed-view";
+import { PrimaryButton } from "@/components/ui/button";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { StandardView } from "@/components/ui/standard-view";
 import { Colors } from "@/constants/theme";
+import { useWorkout } from "@/contexts/WorkoutContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useWorkoutOperations } from "@/hooks/useWorkoutOperations";
-import { SessionExercise, SessionSet } from "@/lib/database/schema";
-import { getLastExercisePerformance } from "@/lib/database/sessionQueries";
-import { getWorkoutTemplateWithExercises } from "@/lib/database/templateQueries";
+import { SessionSet } from "@/lib/database/schema";
 import * as Crypto from "expo-crypto";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -27,66 +26,30 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function ActiveSessionScreen() {
+export default function SessionScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams();
-  const templateId = params.templateId as string;
-
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const colors = Colors[isDark ? "dark" : "light"];
 
+  const { activeSession, dispatch } = useWorkout();
   const { saveWorkout } = useWorkoutOperations();
 
-  const [templateName, setTemplateName] = useState("");
-  const [exercises, setExercises] = useState<SessionExercise[]>([]);
   const [currentExerciseId, setCurrentExerciseId] = useState<string | null>(
     null,
   );
-  const [startTime] = useState(Date.now());
 
   useEffect(() => {
-    loadSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateId]);
-
-  const loadSession = async () => {
-    try {
-      const template = await getWorkoutTemplateWithExercises(templateId);
-      if (!template) {
-        Alert.alert("Error", "Template not found");
-        router.back();
-        return;
-      }
-
-      setTemplateName(template.name);
-
-      // Initialize session exercises with previous performance
-      const sessionExercises: SessionExercise[] = await Promise.all(
-        template.exercises.map(async (te) => {
-          const lastPerformance = await getLastExercisePerformance(te.name);
-          return {
-            templateExerciseId: te.id,
-            name: te.name,
-            notes: te.notes,
-            order: te.order,
-            sets: [], // Start with no sets, user will add them
-            lastPerformance: lastPerformance || undefined,
-          };
-        }),
-      );
-
-      setExercises(sessionExercises);
-      if (sessionExercises.length > 0) {
-        setCurrentExerciseId(sessionExercises[0].templateExerciseId);
-      }
-    } catch (error) {
-      console.error("Error loading session:", error);
-      Alert.alert("Error", "Failed to load workout session");
-      router.back();
+    // Set initial exercise when session starts
+    if (
+      activeSession &&
+      activeSession.exercises.length > 0 &&
+      !currentExerciseId
+    ) {
+      setCurrentExerciseId(activeSession.exercises[0].templateExerciseId);
     }
-  };
+  }, [activeSession, currentExerciseId]);
 
   const handleSelectExercise = (exerciseId: string) => {
     setCurrentExerciseId(exerciseId);
@@ -98,57 +61,74 @@ export default function ActiveSessionScreen() {
     field: "reps" | "weight",
     value: string,
   ) => {
-    setExercises((prev) =>
-      prev.map((ex) => {
-        if (ex.templateExerciseId === exerciseId) {
-          return {
-            ...ex,
-            sets: ex.sets.map((s) =>
-              s.id === setId ? { ...s, [field]: value } : s,
-            ),
-          };
-        }
-        return ex;
-      }),
-    );
+    if (!activeSession) return;
+
+    const updatedExercises = activeSession.exercises.map((ex) => {
+      if (ex.templateExerciseId === exerciseId) {
+        return {
+          ...ex,
+          sets: ex.sets.map((s) =>
+            s.id === setId ? { ...s, [field]: value } : s,
+          ),
+        };
+      }
+      return ex;
+    });
+
+    dispatch({
+      type: "UPDATE_SESSION",
+      payload: { ...activeSession, exercises: updatedExercises },
+    });
   };
 
   const handleAddSet = (exerciseId: string) => {
-    setExercises((prev) =>
-      prev.map((ex) => {
-        if (ex.templateExerciseId === exerciseId) {
-          const newSet: SessionSet = {
-            id: Crypto.randomUUID(),
-            reps: "",
-            weight: "",
-          };
-          return {
-            ...ex,
-            sets: [...ex.sets, newSet],
-          };
-        }
-        return ex;
-      }),
-    );
+    if (!activeSession) return;
+
+    const updatedExercises = activeSession.exercises.map((ex) => {
+      if (ex.templateExerciseId === exerciseId) {
+        const newSet: SessionSet = {
+          id: Crypto.randomUUID(),
+          reps: "",
+          weight: "",
+        };
+        return {
+          ...ex,
+          sets: [...ex.sets, newSet],
+        };
+      }
+      return ex;
+    });
+
+    dispatch({
+      type: "UPDATE_SESSION",
+      payload: { ...activeSession, exercises: updatedExercises },
+    });
   };
 
   const handleDeleteSet = (exerciseId: string, setId: string) => {
-    setExercises((prev) =>
-      prev.map((ex) => {
-        if (ex.templateExerciseId === exerciseId) {
-          return {
-            ...ex,
-            sets: ex.sets.filter((s) => s.id !== setId),
-          };
-        }
-        return ex;
-      }),
-    );
+    if (!activeSession) return;
+
+    const updatedExercises = activeSession.exercises.map((ex) => {
+      if (ex.templateExerciseId === exerciseId) {
+        return {
+          ...ex,
+          sets: ex.sets.filter((s) => s.id !== setId),
+        };
+      }
+      return ex;
+    });
+
+    dispatch({
+      type: "UPDATE_SESSION",
+      payload: { ...activeSession, exercises: updatedExercises },
+    });
   };
 
   const handleFinishWorkout = () => {
+    if (!activeSession) return;
+
     // Validate at least one exercise has been logged
-    const loggedExercises = exercises.filter((ex) =>
+    const loggedExercises = activeSession.exercises.filter((ex) =>
       ex.sets.some(
         (s) =>
           s.reps &&
@@ -188,12 +168,20 @@ export default function ActiveSessionScreen() {
                   })),
               }));
 
-              await saveWorkout(date, "", exercisesData, templateId);
+              await saveWorkout(
+                date,
+                "",
+                exercisesData,
+                activeSession.templateId,
+              );
+
+              // End session
+              dispatch({ type: "END_SESSION" });
 
               Alert.alert("Success", "Workout logged successfully!", [
                 {
                   text: "OK",
-                  onPress: () => router.replace("/(tabs)/"),
+                  onPress: () => router.push("/(tabs)"),
                 },
               ]);
             } catch (error) {
@@ -212,26 +200,65 @@ export default function ActiveSessionScreen() {
       {
         text: "Cancel Workout",
         style: "destructive",
-        onPress: () => router.replace("/(tabs)/"),
+        onPress: () => {
+          dispatch({ type: "END_SESSION" });
+          router.push("/(tabs)");
+        },
       },
     ]);
   };
 
-  const currentExercise = exercises.find(
+  // Empty state when no active session
+  if (!activeSession) {
+    return (
+      <StandardView style={styles.container}>
+        <View
+          style={[styles.emptyStateContainer, { paddingTop: insets.top + 20 }]}
+        >
+          <IconSymbol
+            size={80}
+            name="figure.strengthtraining.traditional"
+            color={isDark ? "#333" : "#ddd"}
+          />
+          <Text
+            style={[styles.emptyTitle, { color: isDark ? "#666" : "#999" }]}
+          >
+            No Active Session
+          </Text>
+          <Text
+            style={[styles.emptySubtitle, { color: isDark ? "#555" : "#aaa" }]}
+          >
+            Start a workout from the Home tab to begin tracking
+          </Text>
+          <PrimaryButton
+            title="Go to Home"
+            icon="house.fill"
+            onPress={() => router.push("/(tabs)")}
+            style={styles.startButton}
+          />
+        </View>
+      </StandardView>
+    );
+  }
+
+  // Active session UI
+  const currentExercise = activeSession.exercises.find(
     (ex) => ex.templateExerciseId === currentExerciseId,
   );
 
-  const completedExercises = exercises.filter((ex) =>
+  const completedExercises = activeSession.exercises.filter((ex) =>
     ex.sets.some(
       (s) =>
         s.reps && s.weight && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
     ),
   ).length;
 
-  const duration = Math.floor((Date.now() - startTime) / 1000 / 60); // minutes
+  const duration = Math.floor(
+    (Date.now() - activeSession.startedAt) / 1000 / 60,
+  ); // minutes
 
   return (
-    <ThemedView style={styles.container}>
+    <StandardView style={styles.container}>
       {/* Header */}
       <View
         style={[
@@ -256,13 +283,13 @@ export default function ActiveSessionScreen() {
           </View>
           <View style={styles.headerCenter}>
             <Text style={[styles.templateName, { color: colors.text }]}>
-              {templateName}
+              {activeSession.templateName}
             </Text>
             <Text
               style={[styles.progress, { color: isDark ? "#999" : "#666" }]}
             >
-              {completedExercises} of {exercises.length} exercises • {duration}{" "}
-              min
+              {completedExercises} of {activeSession.exercises.length} exercises
+              • {duration} min
             </Text>
           </View>
           <View style={styles.headerRight}>
@@ -281,7 +308,7 @@ export default function ActiveSessionScreen() {
         <View style={[styles.navigator, { borderRightColor: colors.border }]}>
           <ScrollView showsVerticalScrollIndicator={false}>
             <ExerciseNavigator
-              exercises={exercises}
+              exercises={activeSession.exercises}
               currentExerciseId={currentExerciseId}
               onSelectExercise={handleSelectExercise}
             />
@@ -310,7 +337,7 @@ export default function ActiveSessionScreen() {
                 }
               />
             ) : (
-              <View style={styles.emptyState}>
+              <View style={styles.exerciseEmptyState}>
                 <IconSymbol
                   size={64}
                   name="dumbbell"
@@ -318,7 +345,7 @@ export default function ActiveSessionScreen() {
                 />
                 <Text
                   style={[
-                    styles.emptyText,
+                    styles.exerciseEmptyText,
                     { color: isDark ? "#999" : "#666" },
                   ]}
                 >
@@ -329,7 +356,7 @@ export default function ActiveSessionScreen() {
           </ScrollView>
         </View>
       </View>
-    </ThemedView>
+    </StandardView>
   );
 }
 
@@ -337,6 +364,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  // Empty state styles
+  emptyStateContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 40,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 16,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  startButton: {
+    paddingHorizontal: 24,
+    borderRadius: 24,
+  },
+  // Active session styles
   header: {
     borderBottomWidth: 1,
     paddingBottom: 12,
@@ -391,13 +442,13 @@ const styles = StyleSheet.create({
   detail: {
     flex: 1,
   },
-  emptyState: {
+  exerciseEmptyState: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 100,
   },
-  emptyText: {
+  exerciseEmptyText: {
     fontSize: 16,
     marginTop: 16,
   },

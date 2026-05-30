@@ -3,13 +3,14 @@
  * Global state management for workout data
  */
 
-import { WorkoutWithExercises } from "@/lib/database/schema";
+import { ActiveSession, WorkoutWithExercises } from "@/lib/database/schema";
 import React, { createContext, ReactNode, useContext, useReducer } from "react";
 
 export interface WorkoutContextType {
   workouts: WorkoutWithExercises[];
   loading: boolean;
   error: string | null;
+  activeSession: ActiveSession | null;
   dispatch: React.Dispatch<WorkoutAction>;
 }
 
@@ -20,6 +21,9 @@ export type WorkoutAction =
   | { type: "DELETE_WORKOUT"; payload: string } // workout id
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "SET_ERROR"; payload: string | null }
+  | { type: "START_SESSION"; payload: ActiveSession }
+  | { type: "UPDATE_SESSION"; payload: ActiveSession }
+  | { type: "END_SESSION" }
   | { type: "RESET" };
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
@@ -28,6 +32,7 @@ const initialState: Omit<WorkoutContextType, "dispatch"> = {
   workouts: [],
   loading: false,
   error: null,
+  activeSession: null,
 };
 
 function workoutReducer(
@@ -81,6 +86,24 @@ function workoutReducer(
         loading: false,
       };
 
+    case "START_SESSION":
+      return {
+        ...state,
+        activeSession: action.payload,
+      };
+
+    case "UPDATE_SESSION":
+      return {
+        ...state,
+        activeSession: action.payload,
+      };
+
+    case "END_SESSION":
+      return {
+        ...state,
+        activeSession: null,
+      };
+
     case "RESET":
       return initialState;
 
@@ -100,6 +123,7 @@ export function WorkoutProvider({ children }: WorkoutProviderProps) {
     workouts: state.workouts,
     loading: state.loading,
     error: state.error,
+    activeSession: state.activeSession,
     dispatch,
   };
 

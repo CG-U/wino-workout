@@ -5,8 +5,8 @@
 
 import { TemplateCard } from "@/components/Templates/TemplateCard";
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { StandardView } from "@/components/ui/standard-view";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
@@ -130,7 +130,7 @@ export default function TemplatesScreen() {
   const customTemplates = templates.filter((t) => !t.isDefault);
 
   return (
-    <ThemedView style={styles.container}>
+    <StandardView style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <ThemedText type="title">Templates</ThemedText>
@@ -221,7 +221,7 @@ export default function TemplatesScreen() {
       >
         <IconSymbol size={28} name="plus.circle.fill" color="#fff" />
       </TouchableOpacity>
-    </ThemedView>
+    </StandardView>
   );
 }
 
@@ -230,7 +230,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
     paddingBottom: 16,
   },
   subtitle: {
@@ -241,7 +240,6 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   sectionHeader: {
-    paddingHorizontal: 16,
     paddingVertical: 12,
   },
   sectionTitle: {

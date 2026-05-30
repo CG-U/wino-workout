@@ -4,8 +4,8 @@
  */
 
 import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { IconSymbol } from "@/components/ui/icon-symbol";
+import { StandardView } from "@/components/ui/standard-view";
 import { Colors } from "@/constants/theme";
 import { useWorkout } from "@/contexts/WorkoutContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -57,7 +57,7 @@ export default function WorkoutsScreen() {
         { text: "Cancel", style: "cancel" },
         {
           text: "Create",
-          onPress: async (templateName) => {
+          onPress: async (templateName?: string) => {
             if (!templateName || templateName.trim() === "") {
               Alert.alert("Error", "Template name cannot be empty");
               return;
@@ -78,8 +78,8 @@ export default function WorkoutsScreen() {
                 templateName.trim(),
                 "Custom",
                 "",
-                false,
                 templateExercises,
+                false,
               );
 
               Alert.alert(
@@ -246,8 +246,8 @@ export default function WorkoutsScreen() {
   );
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+    <StandardView style={styles.container}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
         <ThemedText type="title">Workouts</ThemedText>
         <Text style={[styles.subtitle, { color: isDark ? "#999" : "#666" }]}>
           {workouts.length} workout{workouts.length !== 1 ? "s" : ""}
@@ -277,7 +277,7 @@ export default function WorkoutsScreen() {
           }
         />
       )}
-    </ThemedView>
+    </StandardView>
   );
 }
 
@@ -286,7 +286,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 16,
     paddingBottom: 12,
   },
   subtitle: {
@@ -299,8 +298,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingTop: 8,
   },
   workoutCard: {
     borderWidth: 1,

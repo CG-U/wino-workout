@@ -36,9 +36,22 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="session"
+        options={{
+          title: "Session",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol
+              size={28}
+              name="figure.strengthtraining.traditional"
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="workouts"
         options={{
-          title: "History",
+          title: "Workouts",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="calendar" color={color} />
           ),
