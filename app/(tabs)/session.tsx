@@ -258,7 +258,7 @@ export default function SessionScreen() {
   ); // minutes
 
   return (
-    <StandardView style={styles.container}>
+    <StandardView style={styles.container} padded={false}>
       {/* Header */}
       <View
         style={[
@@ -285,12 +285,16 @@ export default function SessionScreen() {
             <Text style={[styles.templateName, { color: colors.text }]}>
               {activeSession.templateName}
             </Text>
+            {/* 
+            
+            Storing this feature for now
+
             <Text
               style={[styles.progress, { color: isDark ? "#999" : "#666" }]}
             >
               {completedExercises} of {activeSession.exercises.length} exercises
               • {duration} min
-            </Text>
+            </Text> */}
           </View>
           <View style={styles.headerRight}>
             <TouchableOpacity
