@@ -12,6 +12,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { calculateDashboardStats } from "@/lib/analytics/workoutStats";
 import React, { useMemo } from "react";
 import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
+import { BarChart } from "react-native-chart-kit";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const screenWidth = Dimensions.get("window").width;
@@ -67,12 +68,13 @@ export default function DashboardScreen() {
   );
 
   return (
-    <StandardView style={styles.container}>
+    <StandardView style={styles.container} padded={false}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{
           paddingTop: insets.top + 12,
           paddingBottom: insets.bottom + 100,
+          paddingHorizontal: 16,
         }}
       >
         {/* Header */}
@@ -314,38 +316,52 @@ export default function DashboardScreen() {
                     },
                   ]}
                 >
-                  {stats.volumeByWeek.slice(-8).map((week) => {
-                    const maxVol = Math.max(
-                      ...stats.volumeByWeek.map((w) => w.volume),
-                    );
-                    const height =
-                      maxVol > 0 ? (week.volume / maxVol) * 100 : 0;
-
-                    return (
-                      <View key={week.week} style={styles.weekBarContainer}>
-                        <View
-                          style={[
-                            styles.weekBar,
-                            {
-                              height: `${Math.max(20, height)}%`,
-                              backgroundColor: colors.tint,
-                            },
-                          ]}
-                        />
-                        <Text
-                          style={[
-                            styles.weekLabel,
-                            { color: isDark ? "#999" : "#666" },
-                          ]}
-                        >
-                          {new Date(week.week).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </Text>
-                      </View>
-                    );
-                  })}
+                  <BarChart
+                    data={{
+                      labels: stats.volumeByWeek.slice(-8).map((week) =>
+                        new Date(week.week).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        }),
+                      ),
+                      datasets: [
+                        {
+                          data: stats.volumeByWeek
+                            .slice(-8)
+                            .map((w) => w.volume),
+                        },
+                      ],
+                    }}
+                    width={screenWidth - 48}
+                    height={180}
+                    yAxisLabel=""
+                    yAxisSuffix=" kg"
+                    chartConfig={{
+                      backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+                      backgroundGradientFrom: isDark ? "#2a2a2a" : "#f5f5f5",
+                      backgroundGradientTo: isDark ? "#2a2a2a" : "#f5f5f5",
+                      decimalPlaces: 0,
+                      color: (opacity = 1) => colors.tint,
+                      labelColor: (opacity = 1) => (isDark ? "#999" : "#666"),
+                      style: {
+                        borderRadius: 12,
+                      },
+                      propsForBackgroundLines: {
+                        strokeDasharray: "",
+                        stroke: isDark ? "#3a3a3a" : "#e0e0e0",
+                        strokeWidth: 1,
+                      },
+                      propsForLabels: {
+                        fontSize: 10,
+                      },
+                    }}
+                    style={{
+                      marginVertical: 8,
+                      borderRadius: 12,
+                    }}
+                    showValuesOnTopOfBars
+                    fromZero
+                  />
                 </View>
               </View>
             )}
@@ -552,24 +568,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 12,
     padding: 12,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "flex-end",
-    height: 150,
-  },
-  weekBarContainer: {
     alignItems: "center",
-    flex: 1,
-    justifyContent: "flex-end",
-    gap: 4,
-  },
-  weekBar: {
-    width: "80%",
-    borderRadius: 4,
-  },
-  weekLabel: {
-    fontSize: 10,
-    fontWeight: "500",
-    textAlign: "center",
   },
 });
