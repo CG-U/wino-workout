@@ -33,6 +33,29 @@ export function ExerciseDetail({
   const isDark = colorScheme === "dark";
   const colors = Colors[isDark ? "dark" : "light"];
 
+  const handleIncrement = (
+    setId: string,
+    field: "reps" | "weight",
+    currentValue: string,
+  ) => {
+    const current = parseFloat(currentValue) || 0;
+    const increment = field === "reps" ? 1 : 2.5;
+    const newValue = Math.max(field === "reps" ? 1 : 0, current + increment);
+    onUpdateSet(setId, field, newValue.toString());
+  };
+
+  const handleDecrement = (
+    setId: string,
+    field: "reps" | "weight",
+    currentValue: string,
+  ) => {
+    const current = parseFloat(currentValue) || 0;
+    const decrement = field === "reps" ? 1 : 2.5;
+    const floor = field === "reps" ? 1 : 0;
+    const newValue = Math.max(floor, current - decrement);
+    onUpdateSet(setId, field, newValue.toString());
+  };
+
   return (
     <View style={styles.container}>
       {/* Exercise Name */}
@@ -80,16 +103,26 @@ export function ExerciseDetail({
 
       {/* Sets Table Header */}
       <View style={styles.tableHeader}>
-        <Text style={[styles.tableHeaderText, { color: colors.text }]}>
-          SET
-        </Text>
-        <Text style={[styles.tableHeaderText, { color: colors.text }]}>
-          REPS
-        </Text>
-        <Text style={[styles.tableHeaderText, { color: colors.text }]}>
-          WEIGHT (KG)
-        </Text>
-        <View style={styles.tableHeaderSpacer} />
+        <View style={styles.tableHeaderSetColumn}>
+          <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+            SET
+          </Text>
+        </View>
+        <View style={styles.tableHeaderInputColumn}>
+          <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+            REPS
+          </Text>
+        </View>
+        <View style={styles.tableHeaderInputColumn}>
+          <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+            WEIGHT (KG)
+          </Text>
+        </View>
+        <View style={styles.tableHeaderActionsColumn}>
+          <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+            VOLUME
+          </Text>
+        </View>
       </View>
 
       {/* Sets */}
@@ -97,58 +130,153 @@ export function ExerciseDetail({
         <View
           key={set.id}
           style={[
-            styles.setRow,
+            styles.setRowContainer,
             {
               backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5",
               borderColor: colors.border,
             },
           ]}
         >
-          <View style={styles.setNumber}>
-            <Text style={[styles.setNumberText, { color: colors.text }]}>
-              {index + 1}
-            </Text>
+          <View style={styles.setRow}>
+            {/* Set Number - Centered */}
+            <View style={styles.setNumberColumn}>
+              <Text style={[styles.setNumberText, { color: colors.text }]}>
+                {index + 1}
+              </Text>
+            </View>
+
+            {/* Reps Column */}
+            <View style={styles.inputColumn}>
+              <TextInput
+                style={[
+                  styles.setInput,
+                  {
+                    borderColor: colors.border,
+                    backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                    color: colors.text,
+                  },
+                ]}
+                value={set.reps}
+                onChangeText={(value) => onUpdateSet(set.id, "reps", value)}
+                keyboardType="number-pad"
+                placeholder="0"
+                placeholderTextColor={isDark ? "#666" : "#999"}
+              />
+              <View style={styles.stepperRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.stepperSquareButton,
+                    {
+                      backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  onPress={() => handleDecrement(set.id, "reps", set.reps)}
+                  accessibilityLabel="Decrease reps"
+                  accessibilityRole="button"
+                >
+                  <IconSymbol size={18} name="minus" color={colors.tint} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.stepperSquareButton,
+                    {
+                      backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  onPress={() => handleIncrement(set.id, "reps", set.reps)}
+                  accessibilityLabel="Increase reps"
+                  accessibilityRole="button"
+                >
+                  <IconSymbol size={18} name="plus" color={colors.tint} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Weight Column */}
+            <View style={styles.inputColumn}>
+              <TextInput
+                style={[
+                  styles.setInput,
+                  {
+                    borderColor: colors.border,
+                    backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                    color: colors.text,
+                  },
+                ]}
+                value={set.weight}
+                onChangeText={(value) => onUpdateSet(set.id, "weight", value)}
+                keyboardType="decimal-pad"
+                placeholder="0"
+                placeholderTextColor={isDark ? "#666" : "#999"}
+              />
+              <View style={styles.stepperRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.stepperSquareButton,
+                    {
+                      backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  onPress={() => handleDecrement(set.id, "weight", set.weight)}
+                  accessibilityLabel="Decrease weight"
+                  accessibilityRole="button"
+                >
+                  <IconSymbol size={18} name="minus" color={colors.tint} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.stepperSquareButton,
+                    {
+                      backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  onPress={() => handleIncrement(set.id, "weight", set.weight)}
+                  accessibilityLabel="Increase weight"
+                  accessibilityRole="button"
+                >
+                  <IconSymbol size={18} name="plus" color={colors.tint} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Action Buttons Column */}
+            <View style={styles.actionsColumn}>
+              {/* Volume Display */}
+              <View style={styles.volumeDisplay}>
+                <Text style={[styles.volumeText, { color: colors.text }]}>
+                  {set.reps && set.weight
+                    ? `${(parseFloat(set.reps) * parseFloat(set.weight)).toFixed(1)}`
+                    : "—"}
+                </Text>
+                <Text
+                  style={[
+                    styles.volumeLabel,
+                    { color: isDark ? "#666" : "#999" },
+                  ]}
+                >
+                  kg
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={[
+                  styles.deleteButton,
+                  {
+                    backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                    borderColor: colors.border,
+                  },
+                ]}
+                onPress={() => onDeleteSet(set.id)}
+                accessibilityLabel="Delete set"
+                accessibilityRole="button"
+              >
+                <IconSymbol size={18} name="trash" color="#FF3B30" />
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <TextInput
-            style={[
-              styles.setInput,
-              {
-                borderColor: colors.border,
-                backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                color: colors.text,
-              },
-            ]}
-            value={set.reps}
-            onChangeText={(value) => onUpdateSet(set.id, "reps", value)}
-            keyboardType="number-pad"
-            placeholder="0"
-            placeholderTextColor={isDark ? "#666" : "#999"}
-          />
-
-          <TextInput
-            style={[
-              styles.setInput,
-              {
-                borderColor: colors.border,
-                backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                color: colors.text,
-              },
-            ]}
-            value={set.weight}
-            onChangeText={(value) => onUpdateSet(set.id, "weight", value)}
-            keyboardType="decimal-pad"
-            placeholder="0"
-            placeholderTextColor={isDark ? "#666" : "#999"}
-          />
-
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => onDeleteSet(set.id)}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <IconSymbol size={20} name="trash" color="#FF3B30" />
-          </TouchableOpacity>
         </View>
       ))}
 
@@ -226,45 +354,98 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 8,
     paddingBottom: 8,
+    gap: 8,
+  },
+  tableHeaderSetColumn: {
+    width: 32,
+    alignItems: "center",
+  },
+  tableHeaderInputColumn: {
+    flex: 1,
+    alignItems: "center",
+  },
+  tableHeaderActionsColumn: {
+    width: 60,
+    alignItems: "center",
   },
   tableHeaderText: {
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 0.5,
   },
-  tableHeaderSpacer: {
-    width: 36,
+  setRowContainer: {
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 8,
+    padding: 12,
   },
   setRow: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginBottom: 8,
+    gap: 12,
   },
-  setNumber: {
+  setNumberColumn: {
     width: 32,
     alignItems: "center",
+    justifyContent: "center",
   },
   setNumberText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  inputColumn: {
+    flex: 1,
+    gap: 8,
   },
   setInput: {
-    flex: 1,
     borderWidth: 1,
-    borderRadius: 6,
+    borderRadius: 8,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 16,
-    fontWeight: "500",
-    marginHorizontal: 4,
+    paddingVertical: 12,
+    fontSize: 18,
+    fontWeight: "600",
     textAlign: "center",
   },
-  deleteButton: {
-    width: 36,
+  stepperRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  stepperSquareButton: {
+    flex: 1,
+    aspectRatio: 1,
+    borderRadius: 8,
+    borderWidth: 1,
     alignItems: "center",
+    justifyContent: "center",
+    minHeight: 44,
+  },
+  actionsColumn: {
+    width: 60,
+    gap: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  volumeDisplay: {
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 44,
+  },
+  volumeText: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  volumeLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    marginTop: 2,
+  },
+  deleteButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   addSetButton: {
     flexDirection: "row",

@@ -15,12 +15,14 @@ interface ExerciseNavigatorProps {
   exercises: SessionExercise[];
   currentExerciseId: string | null;
   onSelectExercise: (exerciseId: string) => void;
+  isCollapsed?: boolean;
 }
 
 export function ExerciseNavigator({
   exercises,
   currentExerciseId,
   onSelectExercise,
+  isCollapsed = false,
 }: ExerciseNavigatorProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -68,6 +70,42 @@ export function ExerciseNavigator({
         const statusColor = getStatusColor(status);
         const isActive = currentExerciseId === exercise.templateExerciseId;
 
+        if (isCollapsed) {
+          // Collapsed mode: vertical layout with number + icon only
+          return (
+            <TouchableOpacity
+              key={exercise.templateExerciseId}
+              style={[
+                styles.exerciseItemCollapsed,
+                {
+                  backgroundColor: isActive
+                    ? isDark
+                      ? "#2a2a2a"
+                      : "#f5f5f5"
+                    : "transparent",
+                },
+              ]}
+              onPress={() => onSelectExercise(exercise.templateExerciseId)}
+              activeOpacity={0.7}
+              accessibilityLabel={`Exercise ${index + 1}: ${exercise.name}`}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isActive }}
+            >
+              <Text
+                style={[styles.exerciseNumberCollapsed, { color: statusColor }]}
+              >
+                {index + 1}
+              </Text>
+              <IconSymbol
+                size={16}
+                name={getStatusIcon(status)}
+                color={statusColor}
+              />
+            </TouchableOpacity>
+          );
+        }
+
+        // Expanded mode: full layout with name
         return (
           <TouchableOpacity
             key={exercise.templateExerciseId}
@@ -84,6 +122,10 @@ export function ExerciseNavigator({
             ]}
             onPress={() => onSelectExercise(exercise.templateExerciseId)}
             activeOpacity={0.7}
+            accessibilityLabel={`${exercise.name}`}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isActive }}
+            accessibilityHint={`Exercise ${index + 1} of ${exercises.length}, ${status}`}
           >
             <View style={styles.exerciseContent}>
               <View style={styles.exerciseInfo}>
@@ -125,6 +167,14 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderRadius: 8,
   },
+  exerciseItemCollapsed: {
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
+  },
   exerciseContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -140,6 +190,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginRight: 12,
     width: 24,
+  },
+  exerciseNumberCollapsed: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 4,
   },
   exerciseName: {
     fontSize: 15,

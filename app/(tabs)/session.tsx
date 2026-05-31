@@ -39,6 +39,7 @@ export default function SessionScreen() {
   const [currentExerciseId, setCurrentExerciseId] = useState<string | null>(
     null,
   );
+  const [isNavigatorCollapsed, setIsNavigatorCollapsed] = useState(false);
 
   useEffect(() => {
     // Set initial exercise when session starts
@@ -53,6 +54,10 @@ export default function SessionScreen() {
 
   const handleSelectExercise = (exerciseId: string) => {
     setCurrentExerciseId(exerciseId);
+  };
+
+  const toggleNavigator = () => {
+    setIsNavigatorCollapsed((prev) => !prev);
   };
 
   const handleUpdateSet = (
@@ -86,10 +91,12 @@ export default function SessionScreen() {
 
     const updatedExercises = activeSession.exercises.map((ex) => {
       if (ex.templateExerciseId === exerciseId) {
+        // Get the last set to copy values from
+        const lastSet = ex.sets[ex.sets.length - 1];
         const newSet: SessionSet = {
           id: Crypto.randomUUID(),
-          reps: "",
-          weight: "",
+          reps: lastSet?.reps || "",
+          weight: lastSet?.weight || "",
         };
         return {
           ...ex,
@@ -273,6 +280,20 @@ export default function SessionScreen() {
         <View style={styles.headerTop}>
           <View style={styles.headerLeft}>
             <TouchableOpacity
+              onPress={toggleNavigator}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={styles.hamburgerButton}
+              accessibilityLabel="Toggle exercise list"
+              accessibilityHint="Shows or hides the exercise navigation panel"
+              accessibilityRole="button"
+            >
+              <IconSymbol
+                size={24}
+                name="line.3.horizontal"
+                color={colors.tint}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={handleCancelWorkout}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
@@ -309,12 +330,19 @@ export default function SessionScreen() {
 
       <View style={styles.content}>
         {/* Exercise Navigator - Left Side */}
-        <View style={[styles.navigator, { borderRightColor: colors.border }]}>
+        <View
+          style={[
+            styles.navigator,
+            isNavigatorCollapsed && styles.navigatorCollapsed,
+            { borderRightColor: colors.border },
+          ]}
+        >
           <ScrollView showsVerticalScrollIndicator={false}>
             <ExerciseNavigator
               exercises={activeSession.exercises}
               currentExerciseId={currentExerciseId}
               onSelectExercise={handleSelectExercise}
+              isCollapsed={isNavigatorCollapsed}
             />
           </ScrollView>
         </View>
@@ -403,6 +431,12 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     minWidth: 70,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  hamburgerButton: {
+    padding: 4,
   },
   headerCenter: {
     flex: 1,
@@ -442,6 +476,9 @@ const styles = StyleSheet.create({
     width: "35%",
     borderRightWidth: 1,
     paddingVertical: 12,
+  },
+  navigatorCollapsed: {
+    width: "10%",
   },
   detail: {
     flex: 1,
