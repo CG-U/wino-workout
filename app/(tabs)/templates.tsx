@@ -3,6 +3,7 @@
  * Manage workout templates - view, create, edit, and delete
  */
 
+import { CreateTemplateModal } from "@/components/Templates/CreateTemplateModal";
 import { TemplateCard } from "@/components/Templates/TemplateCard";
 import { ThemedText } from "@/components/themed-text";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -37,6 +38,7 @@ export default function TemplatesScreen() {
   );
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const loadTemplates = async () => {
     try {
@@ -97,8 +99,12 @@ export default function TemplatesScreen() {
   };
 
   const handleCreateTemplate = () => {
-    // TODO: Navigate to create template screen
-    Alert.alert("Create Template", "Template creation coming soon!");
+    setShowCreateModal(true);
+  };
+
+  const handleTemplateCreated = () => {
+    setShowCreateModal(false);
+    loadTemplates();
   };
 
   const renderEmptyState = () => (
@@ -130,97 +136,106 @@ export default function TemplatesScreen() {
   const customTemplates = templates.filter((t) => !t.isDefault);
 
   return (
-    <StandardView style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top }]}>
-        <ThemedText type="title">Templates</ThemedText>
-        <Text style={[styles.subtitle, { color: isDark ? "#999" : "#666" }]}>
-          Manage your workout plans
-        </Text>
-      </View>
-
-      {/* Templates List */}
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <Text
-            style={[styles.loadingText, { color: isDark ? "#999" : "#666" }]}
-          >
-            Loading templates...
+    <StandardView style={styles.container} padded={false}>
+      <View style={{ flex: 1, padding: 16 }}>
+        {/* Header */}
+        <View style={[styles.header, { paddingTop: insets.top }]}>
+          <ThemedText type="title">Templates</ThemedText>
+          <Text style={[styles.subtitle, { color: isDark ? "#999" : "#666" }]}>
+            Manage your workout plans
           </Text>
         </View>
-      ) : customTemplates.length === 0 && defaultTemplates.length > 0 ? (
-        <FlatList
-          data={defaultTemplates}
-          renderItem={({ item }) => (
-            <TemplateCard
-              template={item}
-              onPress={() => handleTemplatePress(item)}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={[
-            styles.listContent,
-            { paddingBottom: insets.bottom + 100 },
-          ]}
-          ListFooterComponent={renderEmptyState}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              tintColor={colors.tint}
-            />
-          }
-        />
-      ) : (
-        <FlatList
-          data={[...customTemplates, ...defaultTemplates]}
-          renderItem={({ item }) => (
-            <TemplateCard
-              template={item}
-              onPress={() => handleTemplatePress(item)}
-              onDelete={
-                !item.isDefault ? () => handleDeleteTemplate(item) : undefined
-              }
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={[
-            styles.listContent,
-            { paddingBottom: insets.bottom + 100 },
-          ]}
-          ListHeaderComponent={
-            customTemplates.length > 0 ? (
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                  My Templates
-                </Text>
-              </View>
-            ) : null
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              tintColor={colors.tint}
-            />
-          }
-        />
-      )}
 
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={[
-          styles.fab,
-          {
-            backgroundColor: colors.tint,
-            bottom: insets.bottom + 80,
-          },
-        ]}
-        onPress={handleCreateTemplate}
-        activeOpacity={0.8}
-      >
-        <IconSymbol size={28} name="plus.circle.fill" color="#fff" />
-      </TouchableOpacity>
+        {/* Templates List */}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <Text
+              style={[styles.loadingText, { color: isDark ? "#999" : "#666" }]}
+            >
+              Loading templates...
+            </Text>
+          </View>
+        ) : customTemplates.length === 0 && defaultTemplates.length > 0 ? (
+          <FlatList
+            data={defaultTemplates}
+            renderItem={({ item }) => (
+              <TemplateCard
+                template={item}
+                onPress={() => handleTemplatePress(item)}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={[
+              styles.listContent,
+              { paddingBottom: insets.bottom + 100 },
+            ]}
+            ListFooterComponent={renderEmptyState}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor={colors.tint}
+              />
+            }
+          />
+        ) : (
+          <FlatList
+            data={[...customTemplates, ...defaultTemplates]}
+            renderItem={({ item }) => (
+              <TemplateCard
+                template={item}
+                onPress={() => handleTemplatePress(item)}
+                onDelete={
+                  !item.isDefault ? () => handleDeleteTemplate(item) : undefined
+                }
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={[
+              styles.listContent,
+              { paddingBottom: insets.bottom + 100 },
+            ]}
+            ListHeaderComponent={
+              customTemplates.length > 0 ? (
+                <View style={styles.sectionHeader}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                    My Templates
+                  </Text>
+                </View>
+              ) : null
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor={colors.tint}
+              />
+            }
+          />
+        )}
+
+        {/* Floating Action Button */}
+        <TouchableOpacity
+          style={[
+            styles.fab,
+            {
+              backgroundColor: colors.tint,
+              bottom: insets.bottom + 80,
+            },
+          ]}
+          onPress={handleCreateTemplate}
+          activeOpacity={0.8}
+        >
+          <IconSymbol size={28} name="plus.circle.fill" color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Create Template Modal */}
+      <CreateTemplateModal
+        visible={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreated={handleTemplateCreated}
+      />
     </StandardView>
   );
 }

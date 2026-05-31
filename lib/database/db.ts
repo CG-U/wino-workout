@@ -91,6 +91,19 @@ CREATE INDEX IF NOT EXISTS idx_workouts_template_id ON workouts(template_id);
 CREATE INDEX IF NOT EXISTS idx_workout_templates_category ON workout_templates(category);
 `;
 
+const MIGRATION_3 = `
+-- Migration 003: Custom Exercises
+-- Create table for user-defined custom exercises that persist across sessions
+
+CREATE TABLE IF NOT EXISTS custom_exercises (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  created_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_custom_exercises_name ON custom_exercises(name);
+`;
+
 /**
  * Initialize the database
  * Runs migrations if needed
@@ -169,6 +182,23 @@ async function runMigrations(database: SQLite.SQLiteDatabase): Promise<void> {
         ["migration_002", 2, "002_templates", Date.now()],
       );
       console.log("✅ Migration 2 completed");
+    }
+
+    // Check if migration 3 has been run
+    const migration3 = await database.getFirstAsync<{ version: number }>(
+      "SELECT version FROM _prisma_migrations WHERE version = 3",
+    );
+
+    if (!migration3) {
+      console.log("🔄 Running custom exercises migration...");
+      await database.execAsync(MIGRATION_3);
+
+      // Record migration 3
+      await database.runAsync(
+        "INSERT INTO _prisma_migrations (id, version, name, executedAt) VALUES (?, ?, ?, ?)",
+        ["migration_003", 3, "003_custom_exercises", Date.now()],
+      );
+      console.log("✅ Migration 3 completed");
     }
   } catch (error) {
     console.error("❌ Migration error:", error);

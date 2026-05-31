@@ -6,7 +6,12 @@
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import React, { useMemo, useState } from "react";
+import {
+  addCustomExercise,
+  getAllCustomExercises,
+} from "@/lib/database/customExerciseQueries";
+import React, { useEffect, useMemo, useState } from "react";
+
 import {
   FlatList,
   Modal,
@@ -16,6 +21,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Basic exercise library organized by category
 const BASIC_EXERCISES = [
@@ -75,27 +81,51 @@ export function ExercisePickerModal({
   onSelect,
   onClose,
 }: ExercisePickerModalProps) {
+  const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const colors = Colors[isDark ? "dark" : "light"];
 
   const [searchText, setSearchText] = useState("");
+  const [customExercises, setCustomExercises] = useState<string[]>([]);
 
-  // Merge basic exercises with user's logged exercises and remove duplicates
+  // Load custom exercises from DB when modal opens
+  useEffect(() => {
+    if (visible) {
+      getAllCustomExercises().then(setCustomExercises).catch(console.error);
+    }
+  }, [visible]);
+
+  // Merge basic exercises with user's logged exercises and custom exercises, remove duplicates
   const allExercises = useMemo(() => {
-    const combined = [...BASIC_EXERCISES, ...exercises];
+    const combined = [...BASIC_EXERCISES, ...exercises, ...customExercises];
     const unique = Array.from(
       new Set(combined.map((e) => e.toLowerCase())),
     ).map((lower) => combined.find((e) => e.toLowerCase() === lower)!);
     return unique.sort((a, b) => a.localeCompare(b));
-  }, [exercises]);
+  }, [exercises, customExercises]);
 
   const filteredExercises = allExercises.filter((exercise) =>
     exercise.toLowerCase().includes(searchText.toLowerCase()),
   );
 
+  // Check if the search text exactly matches an existing exercise (case-insensitive)
+  const trimmedSearch = searchText.trim();
+  const exactMatchExists = allExercises.some(
+    (e) => e.toLowerCase() === trimmedSearch.toLowerCase(),
+  );
+  const canAddCustom = trimmedSearch.length > 0 && !exactMatchExists;
+
   const handleSelect = (exerciseName: string) => {
     onSelect(exerciseName);
+    setSearchText("");
+  };
+
+  const handleAddCustom = async () => {
+    // Persist to database
+    await addCustomExercise(trimmedSearch);
+    setCustomExercises((prev) => [...prev, trimmedSearch]);
+    onSelect(trimmedSearch);
     setSearchText("");
   };
 
@@ -113,15 +143,7 @@ export function ExercisePickerModal({
         ]}
       >
         {/* Header */}
-        <View
-          style={[
-            styles.header,
-            {
-              backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5",
-              borderBottomColor: colors.border,
-            },
-          ]}
-        >
+        <View style={[styles.header, { paddingTop: insets.top }]}>
           <View style={styles.headerContent}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>
               Select Exercise
@@ -152,7 +174,7 @@ export function ExercisePickerModal({
         </View>
 
         {/* Exercise List */}
-        {filteredExercises.length === 0 ? (
+        {filteredExercises.length === 0 && !canAddCustom ? (
           <View style={styles.emptyContainer}>
             <Text
               style={[styles.emptyText, { color: isDark ? "#999" : "#666" }]}
@@ -191,6 +213,38 @@ export function ExercisePickerModal({
             )}
             keyExtractor={(item) => item}
             contentContainerStyle={styles.listContent}
+            ListHeaderComponent={
+              canAddCustom ? (
+                <TouchableOpacity
+                  style={[
+                    styles.addCustomItem,
+                    {
+                      backgroundColor: isDark ? "#1a2a1a" : "#f0faf0",
+                      borderColor: colors.tint,
+                    },
+                  ]}
+                  onPress={handleAddCustom}
+                >
+                  <View style={styles.addCustomContent}>
+                    <IconSymbol
+                      size={20}
+                      name="plus.circle.fill"
+                      color={colors.tint}
+                    />
+                    <Text
+                      style={[styles.addCustomText, { color: colors.tint }]}
+                    >
+                      Add "{trimmedSearch}"
+                    </Text>
+                  </View>
+                  <IconSymbol
+                    size={16}
+                    name="chevron.right"
+                    color={colors.tint}
+                  />
+                </TouchableOpacity>
+              ) : null
+            }
           />
         )}
       </View>
@@ -201,6 +255,7 @@ export function ExercisePickerModal({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingVertical: 16,
   },
   header: {
     paddingTop: 12,
@@ -227,6 +282,8 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingVertical: 8,
+    paddingHorizontal: 16,
+    gap: 4,
   },
   exerciseItem: {
     flexDirection: "row",
@@ -234,7 +291,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 14,
-    borderBottomWidth: 1,
+
+    borderRadius: 8,
   },
   exerciseName: {
     fontSize: 15,
@@ -254,5 +312,25 @@ const styles = StyleSheet.create({
   emptySubtext: {
     fontSize: 14,
     textAlign: "center",
+  },
+  addCustomItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    marginBottom: 8,
+  },
+  addCustomContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  addCustomText: {
+    fontSize: 15,
+    fontWeight: "600",
   },
 });
