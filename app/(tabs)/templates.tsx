@@ -6,7 +6,11 @@
 import { CreateTemplateModal } from "@/components/Templates/CreateTemplateModal";
 import { TemplateCard } from "@/components/Templates/TemplateCard";
 import { ThemedText } from "@/components/themed-text";
-import { IconButton, PrimaryButton, SecondaryButton } from "@/components/ui/button";
+import {
+  IconButton,
+  PrimaryButton,
+  SecondaryButton,
+} from "@/components/ui/button";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StandardView } from "@/components/ui/standard-view";
 import { Colors } from "@/constants/theme";
@@ -182,7 +186,10 @@ export default function TemplatesScreen() {
           <FlatList
             data={defaultTemplates}
             renderItem={({ item }) => (
-              <TemplateCard template={item} onPress={() => handleTemplatePress(item)} />
+              <TemplateCard
+                template={item}
+                onPress={() => handleTemplatePress(item)}
+              />
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={[
@@ -202,7 +209,10 @@ export default function TemplatesScreen() {
           <FlatList
             data={[...customTemplates, ...defaultTemplates]}
             renderItem={({ item }) => (
-              <TemplateCard template={item} onPress={() => handleTemplatePress(item)} />
+              <TemplateCard
+                template={item}
+                onPress={() => handleTemplatePress(item)}
+              />
             )}
             keyExtractor={(item) => item.id}
             contentContainerStyle={[
@@ -267,10 +277,15 @@ export default function TemplatesScreen() {
               },
             ]}
           >
-            <Text style={[styles.actionTitle, { color: colors.text }]}> 
+            <Text style={[styles.actionTitle, { color: colors.text }]}>
               {selectedTemplate?.name}
             </Text>
-            <Text style={[styles.actionSubtitle, { color: isDark ? "#999" : "#666" }]}> 
+            <Text
+              style={[
+                styles.actionSubtitle,
+                { color: isDark ? "#999" : "#666" },
+              ]}
+            >
               {selectedTemplate?.exercises.length ?? 0} exercises
             </Text>
 
@@ -286,7 +301,10 @@ export default function TemplatesScreen() {
               showsVerticalScrollIndicator
             >
               {(selectedTemplate?.exercises ?? []).map((exercise, index) => (
-                <View key={`${exercise.id}-${index}`} style={styles.exerciseRow}>
+                <View
+                  key={`${exercise.id}-${index}`}
+                  style={styles.exerciseRow}
+                >
                   <Text style={[styles.exerciseIndex, { color: colors.tint }]}>
                     {index + 1}.
                   </Text>
