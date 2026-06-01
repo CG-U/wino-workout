@@ -173,9 +173,7 @@ export default function HomeScreen() {
               <Text style={[styles.statValue, { color: colors.textPrimary }]}>
                 {totalWorkouts}
               </Text>
-              <Text
-                style={[styles.statLabel, { color: colors.textSecondary }]}
-              >
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
                 Total Workouts
               </Text>
             </View>
@@ -193,9 +191,7 @@ export default function HomeScreen() {
               <Text style={[styles.statValue, { color: colors.textPrimary }]}>
                 {lastWorkoutDate}
               </Text>
-              <Text
-                style={[styles.statLabel, { color: colors.textSecondary }]}
-              >
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
                 Last Workout
               </Text>
             </View>
@@ -209,13 +205,15 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              <IconSymbol size={28} name="chart.bar.fill" color={colors.warning} />
+              <IconSymbol
+                size={28}
+                name="chart.bar.fill"
+                color={colors.warning}
+              />
               <Text style={[styles.statValue, { color: colors.textPrimary }]}>
                 {weekVolume.toFixed(0)} kg
               </Text>
-              <Text
-                style={[styles.statLabel, { color: colors.textSecondary }]}
-              >
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
                 This Week
               </Text>
             </View>
@@ -245,19 +243,12 @@ export default function HomeScreen() {
         {/* Empty State for First Time Users */}
         {totalWorkouts === 0 && (
           <View style={styles.emptyState}>
-            <IconSymbol
-              size={64}
-              name="dumbbell"
-              color={colors.textTertiary}
-            />
+            <IconSymbol size={64} name="dumbbell" color={colors.textTertiary} />
             <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
               Welcome to Wino Workout!
             </Text>
             <Text
-              style={[
-                styles.emptySubtitle,
-                { color: colors.textSecondary },
-              ]}
+              style={[styles.emptySubtitle, { color: colors.textSecondary }]}
             >
               Tap &quot;Start Workout&quot; above to begin your fitness journey.
               We&apos;ve got {templates.length} templates ready for you!

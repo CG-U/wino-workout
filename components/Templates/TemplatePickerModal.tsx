@@ -70,10 +70,7 @@ export function TemplatePickerModal({
     >
       <View style={styles.modalOverlay}>
         <View
-          style={[
-            styles.modalContent,
-            { backgroundColor: colors.background },
-          ]}
+          style={[styles.modalContent, { backgroundColor: colors.background }]}
         >
           {/* Header */}
           <View
@@ -121,9 +118,7 @@ export function TemplatePickerModal({
           {/* Template List */}
           {filteredTemplates.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text
-                style={[styles.emptyText, { color: colors.textSecondary }]}
-              >
+              <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
                 No matching templates
               </Text>
             </View>
@@ -142,7 +137,12 @@ export function TemplatePickerModal({
                   onPress={() => handleSelect(template)}
                 >
                   <View style={styles.templateInfo}>
-                    <Text style={[styles.templateName, { color: colors.textPrimary }]}>
+                    <Text
+                      style={[
+                        styles.templateName,
+                        { color: colors.textPrimary },
+                      ]}
+                    >
                       {template.name}
                     </Text>
                     <View style={styles.templateMeta}>

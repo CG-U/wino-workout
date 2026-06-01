@@ -53,7 +53,9 @@ export default function DashboardScreen() {
         {label}
       </Text>
       <View style={styles.statValue}>
-        <Text style={[styles.statNumber, { color: colors.textPrimary }]}>{value}</Text>
+        <Text style={[styles.statNumber, { color: colors.textPrimary }]}>
+          {value}
+        </Text>
         {unit && (
           <Text style={[styles.statUnit, { color: colors.textSecondary }]}>
             {unit}
@@ -64,7 +66,9 @@ export default function DashboardScreen() {
   );
 
   const SectionTitle = ({ title }: { title: string }) => (
-    <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{title}</Text>
+    <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+      {title}
+    </Text>
   );
 
   return (
@@ -92,14 +96,10 @@ export default function DashboardScreen() {
               name="chart.bar.fill"
               color={colors.textTertiary}
             />
-            <Text
-              style={[styles.emptyText, { color: colors.textSecondary }]}
-            >
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               No data yet
             </Text>
-            <Text
-              style={[styles.emptySubtext, { color: colors.textTertiary }]}
-            >
+            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
               Log some workouts to see your progress
             </Text>
           </View>
@@ -145,14 +145,13 @@ export default function DashboardScreen() {
               >
                 <View style={styles.infoRow}>
                   <Text
-                    style={[
-                      styles.infoLabel,
-                      { color: colors.textSecondary },
-                    ]}
+                    style={[styles.infoLabel, { color: colors.textSecondary }]}
                   >
                     Avg. Volume per Workout
                   </Text>
-                  <Text style={[styles.infoValue, { color: colors.textPrimary }]}>
+                  <Text
+                    style={[styles.infoValue, { color: colors.textPrimary }]}
+                  >
                     {stats.averageVolumePerWorkout.toFixed(1)} kg
                   </Text>
                 </View>
@@ -181,7 +180,10 @@ export default function DashboardScreen() {
                     </View>
                     <View style={styles.exerciseInfo}>
                       <Text
-                        style={[styles.exerciseName, { color: colors.textPrimary }]}
+                        style={[
+                          styles.exerciseName,
+                          { color: colors.textPrimary },
+                        ]}
                       >
                         {exercise.name}
                       </Text>
@@ -204,7 +206,9 @@ export default function DashboardScreen() {
                       >
                         Max
                       </Text>
-                      <Text style={[styles.maxWeight, { color: colors.accent }]}>
+                      <Text
+                        style={[styles.maxWeight, { color: colors.accent }]}
+                      >
                         {exercise.maxWeight.toFixed(1)} kg
                       </Text>
                     </View>
@@ -229,14 +233,13 @@ export default function DashboardScreen() {
                     ]}
                   >
                     <View style={styles.prContent}>
-                      <Text style={[styles.prName, { color: colors.textPrimary }]}>
+                      <Text
+                        style={[styles.prName, { color: colors.textPrimary }]}
+                      >
                         {pr.exerciseName}
                       </Text>
                       <Text
-                        style={[
-                          styles.prDate,
-                          { color: colors.textSecondary },
-                        ]}
+                        style={[styles.prDate, { color: colors.textSecondary }]}
                       >
                         {new Date(pr.date).toLocaleDateString()}
                       </Text>
@@ -246,10 +249,7 @@ export default function DashboardScreen() {
                         {pr.maxWeight.toFixed(1)} kg
                       </Text>
                       <Text
-                        style={[
-                          styles.prReps,
-                          { color: colors.textSecondary },
-                        ]}
+                        style={[styles.prReps, { color: colors.textSecondary }]}
                       >
                         × {pr.reps}
                       </Text>
@@ -275,7 +275,10 @@ export default function DashboardScreen() {
                     ]}
                   >
                     <Text
-                      style={[styles.frequencyName, { color: colors.textPrimary }]}
+                      style={[
+                        styles.frequencyName,
+                        { color: colors.textPrimary },
+                      ]}
                     >
                       {item.name}
                     </Text>

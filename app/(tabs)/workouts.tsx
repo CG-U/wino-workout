@@ -158,9 +158,7 @@ export default function WorkoutsScreen() {
             <Text style={[styles.date, { color: colors.textPrimary }]}>
               {formattedDate}
             </Text>
-            <Text
-              style={[styles.dateSubtext, { color: colors.textSecondary }]}
-            >
+            <Text style={[styles.dateSubtext, { color: colors.textSecondary }]}>
               {workout.exerciseCount} exercise
               {workout.exerciseCount !== 1 ? "s" : ""} •{" "}
               {workout.totalVolume.toFixed(1)} kg
@@ -193,7 +191,9 @@ export default function WorkoutsScreen() {
           <View style={styles.exercisesSection}>
             {workout.exercises.slice(0, 3).map((exercise, index) => (
               <View key={exercise.id} style={styles.exerciseSummary}>
-                <Text style={[styles.exerciseName, { color: colors.textPrimary }]}>
+                <Text
+                  style={[styles.exerciseName, { color: colors.textPrimary }]}
+                >
                   • {exercise.name}
                 </Text>
                 <Text
@@ -210,10 +210,7 @@ export default function WorkoutsScreen() {
             ))}
             {workout.exercises.length > 3 && (
               <Text
-                style={[
-                  styles.moreExercises,
-                  { color: colors.textSecondary },
-                ]}
+                style={[styles.moreExercises, { color: colors.textSecondary }]}
               >
                 +{workout.exercises.length - 3} more
               </Text>

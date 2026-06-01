@@ -227,14 +227,10 @@ export default function SessionScreen() {
             name="figure.strengthtraining.traditional"
             color={colors.textTertiary}
           />
-          <Text
-            style={[styles.emptyTitle, { color: colors.textSecondary }]}
-          >
+          <Text style={[styles.emptyTitle, { color: colors.textSecondary }]}>
             No Active Session
           </Text>
-          <Text
-            style={[styles.emptySubtitle, { color: colors.textTertiary }]}
-          >
+          <Text style={[styles.emptySubtitle, { color: colors.textTertiary }]}>
             Start a workout from the Home tab to begin tracking
           </Text>
           <PrimaryButton

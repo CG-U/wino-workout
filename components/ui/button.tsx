@@ -169,10 +169,7 @@ export function CardButton({
       <View style={styles.cardButtonContent}>
         {icon && (
           <View
-            style={[
-              styles.cardIcon,
-              { backgroundColor: colors.accentSubtle },
-            ]}
+            style={[styles.cardIcon, { backgroundColor: colors.accentSubtle }]}
           >
             <IconSymbol
               size={24}
@@ -195,7 +192,11 @@ export function CardButton({
         </View>
       </View>
       {showChevron && (
-        <IconSymbol size={20} name="chevron.right" color={colors.textTertiary} />
+        <IconSymbol
+          size={20}
+          name="chevron.right"
+          color={colors.textTertiary}
+        />
       )}
     </TouchableOpacity>
   );

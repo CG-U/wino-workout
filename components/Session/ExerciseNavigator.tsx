@@ -78,9 +78,7 @@ export function ExerciseNavigator({
               style={[
                 styles.exerciseItemCollapsed,
                 {
-                  backgroundColor: isActive
-                    ? colors.surface2
-                    : "transparent",
+                  backgroundColor: isActive ? colors.surface2 : "transparent",
                 },
               ]}
               onPress={() => onSelectExercise(exercise.templateExerciseId)}
@@ -110,9 +108,7 @@ export function ExerciseNavigator({
             style={[
               styles.exerciseItem,
               {
-                backgroundColor: isActive
-                  ? colors.surface2
-                  : "transparent",
+                backgroundColor: isActive ? colors.surface2 : "transparent",
                 borderLeftColor: statusColor,
               },
             ]}

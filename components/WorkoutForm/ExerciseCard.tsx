@@ -127,7 +127,9 @@ export function ExerciseCard({
 
       {/* Sets */}
       <View style={styles.setsContainer}>
-        <Text style={[styles.setsLabel, { color: colors.textSecondary }]}>Sets</Text>
+        <Text style={[styles.setsLabel, { color: colors.textSecondary }]}>
+          Sets
+        </Text>
         {exercise.sets.length === 0 ? (
           <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
             No sets added yet

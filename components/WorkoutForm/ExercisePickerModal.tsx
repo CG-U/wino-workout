@@ -136,12 +136,7 @@ export function ExercisePickerModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: colors.background },
-        ]}
-      >
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top }]}>
           <View style={styles.headerContent}>
@@ -152,7 +147,11 @@ export function ExercisePickerModal({
               onPress={onClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <IconSymbol size={24} name="chevron.right" color={colors.textSecondary} />
+              <IconSymbol
+                size={24}
+                name="chevron.right"
+                color={colors.textSecondary}
+              />
             </TouchableOpacity>
           </View>
 
@@ -176,14 +175,10 @@ export function ExercisePickerModal({
         {/* Exercise List */}
         {filteredExercises.length === 0 && !canAddCustom ? (
           <View style={styles.emptyContainer}>
-            <Text
-              style={[styles.emptyText, { color: colors.textSecondary }]}
-            >
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               No matching exercises
             </Text>
-            <Text
-              style={[styles.emptySubtext, { color: colors.textTertiary }]}
-            >
+            <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
               Try a different search term
             </Text>
           </View>
@@ -201,7 +196,9 @@ export function ExercisePickerModal({
                 ]}
                 onPress={() => handleSelect(exercise)}
               >
-                <Text style={[styles.exerciseName, { color: colors.textPrimary }]}>
+                <Text
+                  style={[styles.exerciseName, { color: colors.textPrimary }]}
+                >
                   {exercise}
                 </Text>
                 <IconSymbol

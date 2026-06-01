@@ -80,10 +80,17 @@ export function ExerciseDetail({
             color={colors.success}
           />
           <View style={styles.lastPerformanceText}>
-            <Text style={[styles.lastPerformanceLabel, { color: colors.success }]}>
+            <Text
+              style={[styles.lastPerformanceLabel, { color: colors.success }]}
+            >
               Last time:
             </Text>
-            <Text style={[styles.lastPerformanceValue, { color: colors.textPrimary }]}>
+            <Text
+              style={[
+                styles.lastPerformanceValue,
+                { color: colors.textPrimary },
+              ]}
+            >
               {exercise.lastPerformance.sets
                 .map((s) => `${s.reps}×${s.weight}`)
                 .join(", ")}{" "}
@@ -104,22 +111,30 @@ export function ExerciseDetail({
       {/* Sets Table Header */}
       <View style={styles.tableHeader}>
         <View style={styles.tableHeaderSetColumn}>
-          <Text style={[styles.tableHeaderText, { color: colors.textSecondary }]}>
+          <Text
+            style={[styles.tableHeaderText, { color: colors.textSecondary }]}
+          >
             SET
           </Text>
         </View>
         <View style={styles.tableHeaderInputColumn}>
-          <Text style={[styles.tableHeaderText, { color: colors.textSecondary }]}>
+          <Text
+            style={[styles.tableHeaderText, { color: colors.textSecondary }]}
+          >
             REPS
           </Text>
         </View>
         <View style={styles.tableHeaderInputColumn}>
-          <Text style={[styles.tableHeaderText, { color: colors.textSecondary }]}>
+          <Text
+            style={[styles.tableHeaderText, { color: colors.textSecondary }]}
+          >
             WEIGHT (KG)
           </Text>
         </View>
         <View style={styles.tableHeaderActionsColumn}>
-          <Text style={[styles.tableHeaderText, { color: colors.textSecondary }]}>
+          <Text
+            style={[styles.tableHeaderText, { color: colors.textSecondary }]}
+          >
             VOLUME
           </Text>
         </View>
@@ -140,7 +155,9 @@ export function ExerciseDetail({
           <View style={styles.setRow}>
             {/* Set Number - Centered */}
             <View style={styles.setNumberColumn}>
-              <Text style={[styles.setNumberText, { color: colors.textPrimary }]}>
+              <Text
+                style={[styles.setNumberText, { color: colors.textPrimary }]}
+              >
                 {index + 1}
               </Text>
             </View>
@@ -247,16 +264,15 @@ export function ExerciseDetail({
             <View style={styles.actionsColumn}>
               {/* Volume Display */}
               <View style={styles.volumeDisplay}>
-                <Text style={[styles.volumeText, { color: colors.textPrimary }]}>
+                <Text
+                  style={[styles.volumeText, { color: colors.textPrimary }]}
+                >
                   {set.reps && set.weight
                     ? `${(parseFloat(set.reps) * parseFloat(set.weight)).toFixed(1)}`
                     : "—"}
                 </Text>
                 <Text
-                  style={[
-                    styles.volumeLabel,
-                    { color: colors.textTertiary },
-                  ]}
+                  style={[styles.volumeLabel, { color: colors.textTertiary }]}
                 >
                   kg
                 </Text>
@@ -292,15 +308,15 @@ export function ExerciseDetail({
         onPress={onAddSet}
       >
         <IconSymbol size={20} name="plus.circle.fill" color={colors.accent} />
-        <Text style={[styles.addSetText, { color: colors.accent }]}>Add Set</Text>
+        <Text style={[styles.addSetText, { color: colors.accent }]}>
+          Add Set
+        </Text>
       </TouchableOpacity>
 
       {/* Notes */}
       {exercise.notes && (
         <View style={styles.notesContainer}>
-          <Text
-            style={[styles.notesLabel, { color: colors.textSecondary }]}
-          >
+          <Text style={[styles.notesLabel, { color: colors.textSecondary }]}>
             Notes:
           </Text>
           <Text style={[styles.notesText, { color: colors.textPrimary }]}>

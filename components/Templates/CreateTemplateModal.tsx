@@ -144,10 +144,7 @@ export function CreateTemplateModal({
       onRequestClose={handleClose}
     >
       <KeyboardAvoidingView
-        style={[
-          styles.container,
-          { backgroundColor: colors.background },
-        ]}
+        style={[styles.container, { backgroundColor: colors.background }]}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         {/* Header */}
@@ -214,7 +211,9 @@ export function CreateTemplateModal({
 
           {/* Category */}
           <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>Category</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>
+              Category
+            </Text>
             <View style={styles.categoryRow}>
               {CATEGORIES.map((cat) => (
                 <TouchableOpacity
@@ -223,9 +222,7 @@ export function CreateTemplateModal({
                     styles.categoryChip,
                     {
                       backgroundColor:
-                        category === cat
-                          ? colors.accent
-                          : colors.surface2,
+                        category === cat ? colors.accent : colors.surface2,
                       borderColor:
                         category === cat ? colors.accent : colors.border,
                     },
@@ -322,7 +319,10 @@ export function CreateTemplateModal({
                         {index + 1}
                       </Text>
                       <Text
-                        style={[styles.exerciseName, { color: colors.textPrimary }]}
+                        style={[
+                          styles.exerciseName,
+                          { color: colors.textPrimary },
+                        ]}
                       >
                         {exercise.name}
                       </Text>

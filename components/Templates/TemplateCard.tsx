@@ -81,10 +81,7 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
               {template.name}
             </Text>
             <Text
-              style={[
-                styles.exerciseCount,
-                { color: colors.textSecondary },
-              ]}
+              style={[styles.exerciseCount, { color: colors.textSecondary }]}
             >
               {template.exercises.length} exercise
               {template.exercises.length !== 1 ? "s" : ""}
@@ -94,7 +91,11 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
 
         {/* Right side */}
         <View style={styles.rightContent}>
-          <IconSymbol size={20} name="chevron.right" color={colors.textTertiary} />
+          <IconSymbol
+            size={20}
+            name="chevron.right"
+            color={colors.textTertiary}
+          />
         </View>
       </View>
     </TouchableOpacity>

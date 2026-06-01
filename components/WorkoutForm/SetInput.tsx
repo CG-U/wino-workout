@@ -54,7 +54,9 @@ export function SetInput({
 
       <View style={styles.inputContainer}>
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, { color: colors.textSecondary }]}>Reps</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>
+            Reps
+          </Text>
           <TextInput
             style={[
               styles.input,
