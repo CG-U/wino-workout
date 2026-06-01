@@ -51,13 +51,13 @@ export function TemplatePickerModal({
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "PPL":
-        return "#007AFF";
+        return "#3B82F6";
       case "Bro Split":
-        return "#FF9500";
+        return "#F59E0B";
       case "Full Body":
-        return "#34C759";
+        return "#22C55E";
       default:
-        return colors.tint;
+        return colors.accent;
     }
   };
 
@@ -72,7 +72,7 @@ export function TemplatePickerModal({
         <View
           style={[
             styles.modalContent,
-            { backgroundColor: isDark ? "#151718" : "#fff" },
+            { backgroundColor: colors.background },
           ]}
         >
           {/* Header */}
@@ -80,13 +80,13 @@ export function TemplatePickerModal({
             style={[
               styles.header,
               {
-                backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5",
+                backgroundColor: colors.surface1,
                 borderBottomColor: colors.border,
               },
             ]}
           >
             <View style={styles.headerTop}>
-              <Text style={[styles.headerTitle, { color: colors.text }]}>
+              <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
                 Start Workout
               </Text>
               <TouchableOpacity
@@ -96,7 +96,7 @@ export function TemplatePickerModal({
                 <IconSymbol
                   size={24}
                   name="chevron.right"
-                  color={colors.text}
+                  color={colors.textSecondary}
                 />
               </TouchableOpacity>
             </View>
@@ -107,12 +107,12 @@ export function TemplatePickerModal({
                 styles.searchInput,
                 {
                   borderColor: colors.border,
-                  backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                  color: colors.text,
+                  backgroundColor: colors.surface2,
+                  color: colors.textPrimary,
                 },
               ]}
               placeholder="Search templates..."
-              placeholderTextColor={isDark ? "#666" : "#999"}
+              placeholderTextColor={colors.textTertiary}
               value={searchText}
               onChangeText={setSearchText}
             />
@@ -122,7 +122,7 @@ export function TemplatePickerModal({
           {filteredTemplates.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text
-                style={[styles.emptyText, { color: isDark ? "#999" : "#666" }]}
+                style={[styles.emptyText, { color: colors.textSecondary }]}
               >
                 No matching templates
               </Text>
@@ -135,14 +135,14 @@ export function TemplatePickerModal({
                   style={[
                     styles.templateItem,
                     {
-                      backgroundColor: isDark ? "#1a1a1a" : "#fff",
+                      backgroundColor: colors.surface1,
                       borderBottomColor: colors.border,
                     },
                   ]}
                   onPress={() => handleSelect(template)}
                 >
                   <View style={styles.templateInfo}>
-                    <Text style={[styles.templateName, { color: colors.text }]}>
+                    <Text style={[styles.templateName, { color: colors.textPrimary }]}>
                       {template.name}
                     </Text>
                     <View style={styles.templateMeta}>
@@ -157,7 +157,7 @@ export function TemplatePickerModal({
                       <Text
                         style={[
                           styles.separator,
-                          { color: isDark ? "#666" : "#999" },
+                          { color: colors.textTertiary },
                         ]}
                       >
                         •
@@ -165,7 +165,7 @@ export function TemplatePickerModal({
                       <Text
                         style={[
                           styles.exerciseCount,
-                          { color: isDark ? "#999" : "#666" },
+                          { color: colors.textSecondary },
                         ]}
                       >
                         {template.exercises.length} exercises
@@ -175,7 +175,7 @@ export function TemplatePickerModal({
                   <IconSymbol
                     size={20}
                     name="chevron.right"
-                    color={colors.tint}
+                    color={colors.textTertiary}
                   />
                 </TouchableOpacity>
               )}
@@ -192,7 +192,7 @@ export function TemplatePickerModal({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "flex-end",
   },
   modalContent: {

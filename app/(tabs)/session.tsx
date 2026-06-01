@@ -225,15 +225,15 @@ export default function SessionScreen() {
           <IconSymbol
             size={80}
             name="figure.strengthtraining.traditional"
-            color={isDark ? "#333" : "#ddd"}
+            color={colors.textTertiary}
           />
           <Text
-            style={[styles.emptyTitle, { color: isDark ? "#666" : "#999" }]}
+            style={[styles.emptyTitle, { color: colors.textSecondary }]}
           >
             No Active Session
           </Text>
           <Text
-            style={[styles.emptySubtitle, { color: isDark ? "#555" : "#aaa" }]}
+            style={[styles.emptySubtitle, { color: colors.textTertiary }]}
           >
             Start a workout from the Home tab to begin tracking
           </Text>
@@ -272,7 +272,7 @@ export default function SessionScreen() {
           styles.header,
           {
             paddingTop: insets.top,
-            backgroundColor: isDark ? "#1a1a1a" : "#fff",
+            backgroundColor: colors.surface1,
             borderBottomColor: colors.border,
           },
         ]}
@@ -297,13 +297,13 @@ export default function SessionScreen() {
               onPress={handleCancelWorkout}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={[styles.cancelText, { color: "#FF3B30" }]}>
+              <Text style={[styles.cancelText, { color: colors.destructive }]}>
                 Cancel
               </Text>
             </TouchableOpacity>
           </View>
           <View style={styles.headerCenter}>
-            <Text style={[styles.templateName, { color: colors.text }]}>
+            <Text style={[styles.templateName, { color: colors.textPrimary }]}>
               {activeSession.templateName}
             </Text>
             {/* 
@@ -320,7 +320,7 @@ export default function SessionScreen() {
           <View style={styles.headerRight}>
             <TouchableOpacity
               onPress={handleFinishWorkout}
-              style={[styles.finishButton, { backgroundColor: "#34C759" }]}
+              style={[styles.finishButton, { backgroundColor: colors.success }]}
             >
               <Text style={styles.finishButtonText}>Finish</Text>
             </TouchableOpacity>
@@ -373,12 +373,12 @@ export default function SessionScreen() {
                 <IconSymbol
                   size={64}
                   name="dumbbell"
-                  color={isDark ? "#666" : "#999"}
+                  color={colors.textTertiary}
                 />
                 <Text
                   style={[
                     styles.exerciseEmptyText,
-                    { color: isDark ? "#999" : "#666" },
+                    { color: colors.textSecondary },
                   ]}
                 >
                   Select an exercise to begin

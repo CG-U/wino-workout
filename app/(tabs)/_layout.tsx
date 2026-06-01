@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
+import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -8,13 +9,21 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "dark"];
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.textTertiary,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: colors.surface1,
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
+          ...(Platform.OS === "ios" ? {} : { elevation: 0 }),
+        },
       }}
     >
       <Tabs.Screen

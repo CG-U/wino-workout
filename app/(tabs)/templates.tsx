@@ -6,11 +6,7 @@
 import { CreateTemplateModal } from "@/components/Templates/CreateTemplateModal";
 import { TemplateCard } from "@/components/Templates/TemplateCard";
 import { ThemedText } from "@/components/themed-text";
-import {
-  IconButton,
-  PrimaryButton,
-  SecondaryButton,
-} from "@/components/ui/button";
+import { IconButton, PrimaryButton } from "@/components/ui/button";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StandardView } from "@/components/ui/standard-view";
 import { Colors } from "@/constants/theme";
@@ -136,20 +132,16 @@ export default function TemplatesScreen() {
 
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
-      <IconSymbol
-        size={64}
-        name="list.bullet"
-        color={isDark ? "#666" : "#999"}
-      />
-      <Text style={[styles.emptyTitle, { color: colors.text }]}>
+      <IconSymbol size={64} name="list.bullet" color={colors.textTertiary} />
+      <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
         No Custom Templates
       </Text>
-      <Text style={[styles.emptySubtitle, { color: isDark ? "#999" : "#666" }]}>
+      <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
         You have {templates.length} default templates.{"\n"}
         Create your own custom workout plan!
       </Text>
       <TouchableOpacity
-        style={[styles.createButton, { backgroundColor: colors.tint }]}
+        style={[styles.createButton, { backgroundColor: colors.accent }]}
         onPress={handleCreateTemplate}
       >
         <IconSymbol size={20} name="plus.circle.fill" color="#fff" />
@@ -168,7 +160,7 @@ export default function TemplatesScreen() {
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top }]}>
           <ThemedText type="title">Templates</ThemedText>
-          <Text style={[styles.subtitle, { color: isDark ? "#999" : "#666" }]}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Manage your workout plans
           </Text>
         </View>
@@ -176,9 +168,7 @@ export default function TemplatesScreen() {
         {/* Templates List */}
         {loading ? (
           <View style={styles.loadingContainer}>
-            <Text
-              style={[styles.loadingText, { color: isDark ? "#999" : "#666" }]}
-            >
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>
               Loading templates...
             </Text>
           </View>
@@ -222,7 +212,9 @@ export default function TemplatesScreen() {
             ListHeaderComponent={
               customTemplates.length > 0 ? (
                 <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                  <Text
+                    style={[styles.sectionTitle, { color: colors.textPrimary }]}
+                  >
                     My Templates
                   </Text>
                 </View>
@@ -247,7 +239,7 @@ export default function TemplatesScreen() {
           style={StyleSheet.flatten([
             styles.fab,
             {
-              backgroundColor: Colors.light.tint,
+              backgroundColor: colors.accent,
               bottom: insets.bottom + 80,
             },
           ])}
@@ -272,19 +264,25 @@ export default function TemplatesScreen() {
             style={[
               styles.actionModal,
               {
-                backgroundColor: isDark ? "#1a1a1a" : "#fff",
+                backgroundColor: colors.surface1,
                 borderColor: colors.border,
               },
             ]}
           >
-            <Text style={[styles.actionTitle, { color: colors.text }]}>
+            {/* Close button */}
+            <TouchableOpacity
+              style={styles.actionCloseButton}
+              onPress={() => setShowTemplateModal(false)}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <IconSymbol size={22} name="xmark" color={colors.textSecondary} />
+            </TouchableOpacity>
+
+            <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>
               {selectedTemplate?.name}
             </Text>
             <Text
-              style={[
-                styles.actionSubtitle,
-                { color: isDark ? "#999" : "#666" },
-              ]}
+              style={[styles.actionSubtitle, { color: colors.textSecondary }]}
             >
               {selectedTemplate?.exercises.length ?? 0} exercises
             </Text>
@@ -293,7 +291,7 @@ export default function TemplatesScreen() {
               style={[
                 styles.exerciseListContainer,
                 {
-                  backgroundColor: isDark ? "#111" : "#f7f7f7",
+                  backgroundColor: colors.surface2,
                   borderColor: colors.border,
                 },
               ]}
@@ -305,12 +303,17 @@ export default function TemplatesScreen() {
                   key={`${exercise.id}-${index}`}
                   style={styles.exerciseRow}
                 >
-                  <Text style={[styles.exerciseIndex, { color: colors.tint }]}>
+                  <Text
+                    style={[styles.exerciseIndex, { color: colors.accent }]}
+                  >
                     {index + 1}.
                   </Text>
                   <Text
                     numberOfLines={1}
-                    style={[styles.exerciseRowText, { color: colors.text }]}
+                    style={[
+                      styles.exerciseRowText,
+                      { color: colors.textPrimary },
+                    ]}
                   >
                     {exercise.name}
                   </Text>
@@ -318,27 +321,32 @@ export default function TemplatesScreen() {
               ))}
             </ScrollView>
 
-            <PrimaryButton
-              title="Edit Template"
-              onPress={handleEditSelectedTemplate}
-              icon="pencil"
-              style={styles.actionButton}
-            />
-
-            {!selectedTemplate?.isDefault && (
-              <SecondaryButton
-                title="Delete Template"
-                onPress={handleDeleteSelectedTemplate}
-                icon="trash"
-                style={styles.deleteActionButton}
+            <View style={styles.actionButtonRow}>
+              <PrimaryButton
+                title="Edit Template"
+                onPress={handleEditSelectedTemplate}
+                icon="pencil"
+                style={styles.editActionButton}
               />
-            )}
-
-            <SecondaryButton
-              title="Cancel"
-              onPress={() => setShowTemplateModal(false)}
-              style={styles.cancelActionButton}
-            />
+              {!selectedTemplate?.isDefault && (
+                <TouchableOpacity
+                  style={[
+                    styles.deleteIconButton,
+                    {
+                      backgroundColor: colors.surface2,
+                      borderColor: colors.border,
+                    },
+                  ]}
+                  onPress={handleDeleteSelectedTemplate}
+                >
+                  <IconSymbol
+                    size={20}
+                    name="trash"
+                    color={colors.destructive}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
       </Modal>
@@ -451,6 +459,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
   },
+  actionCloseButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    zIndex: 1,
+    padding: 4,
+  },
   actionTitle: {
     fontSize: 20,
     fontWeight: "700",
@@ -484,13 +499,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flex: 1,
   },
-  actionButton: {
-    marginBottom: 10,
+  actionButtonRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 10,
   },
-  deleteActionButton: {
-    marginBottom: 10,
+  editActionButton: {
+    flex: 3,
+    marginBottom: 0,
   },
-  cancelActionButton: {
-    marginTop: 2,
+  deleteIconButton: {
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
   },
 });

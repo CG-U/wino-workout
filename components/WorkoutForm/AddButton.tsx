@@ -30,8 +30,7 @@ export function AddButton({
   size = "medium",
 }: AddButtonProps) {
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const tintColor = Colors[isDark ? "dark" : "light"].tint;
+  const colors = Colors[colorScheme ?? "dark"];
 
   const sizeStyles = {
     small: {
@@ -52,7 +51,7 @@ export function AddButton({
     <TouchableOpacity
       style={[
         styles.button,
-        { borderColor: tintColor, backgroundColor: `${tintColor}15` },
+        { borderColor: colors.accent, backgroundColor: colors.accentSubtle },
         sizeStyles[size],
         style,
       ]}
@@ -62,7 +61,7 @@ export function AddButton({
       <Text
         style={[
           styles.buttonText,
-          { color: tintColor },
+          { color: colors.accent },
           size === "small" && styles.smallText,
           textStyle,
         ]}

@@ -42,13 +42,13 @@ export function ExerciseNavigator({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "not-started":
-        return isDark ? "#666" : "#999";
+        return colors.textTertiary;
       case "in-progress":
-        return "#007AFF";
+        return colors.accent;
       case "complete":
-        return "#34C759";
+        return colors.success;
       default:
-        return colors.text;
+        return colors.textPrimary;
     }
   };
 
@@ -79,9 +79,7 @@ export function ExerciseNavigator({
                 styles.exerciseItemCollapsed,
                 {
                   backgroundColor: isActive
-                    ? isDark
-                      ? "#2a2a2a"
-                      : "#f5f5f5"
+                    ? colors.surface2
                     : "transparent",
                 },
               ]}
@@ -113,9 +111,7 @@ export function ExerciseNavigator({
               styles.exerciseItem,
               {
                 backgroundColor: isActive
-                  ? isDark
-                    ? "#2a2a2a"
-                    : "#f5f5f5"
+                  ? colors.surface2
                   : "transparent",
                 borderLeftColor: statusColor,
               },
@@ -135,9 +131,9 @@ export function ExerciseNavigator({
                 <Text
                   style={[
                     styles.exerciseName,
-                    { color: colors.text },
+                    { color: colors.textPrimary },
                     status === "not-started" && {
-                      color: isDark ? "#666" : "#999",
+                      color: colors.textTertiary,
                     },
                   ]}
                 >

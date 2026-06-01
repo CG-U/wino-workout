@@ -146,7 +146,7 @@ export function CreateTemplateModal({
       <KeyboardAvoidingView
         style={[
           styles.container,
-          { backgroundColor: isDark ? "#151718" : "#fff" },
+          { backgroundColor: colors.background },
         ]}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
@@ -156,17 +156,17 @@ export function CreateTemplateModal({
             styles.header,
             {
               paddingTop: insets.top + 8,
-              backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5",
+              backgroundColor: colors.surface1,
               borderBottomColor: colors.border,
             },
           ]}
         >
           <TouchableOpacity onPress={handleClose} style={styles.headerButton}>
-            <Text style={[styles.cancelText, { color: colors.tint }]}>
+            <Text style={[styles.cancelText, { color: colors.textSecondary }]}>
               Cancel
             </Text>
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>
+          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
             {mode === "edit" ? "Edit Template" : "New Template"}
           </Text>
           <TouchableOpacity
@@ -177,7 +177,7 @@ export function CreateTemplateModal({
             <Text
               style={[
                 styles.saveText,
-                { color: colors.tint, opacity: saving ? 0.5 : 1 },
+                { color: colors.accent, opacity: saving ? 0.5 : 1 },
               ]}
             >
               {saving ? "Saving..." : "Save"}
@@ -192,20 +192,20 @@ export function CreateTemplateModal({
         >
           {/* Template Name */}
           <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.text }]}>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>
               Template Name
             </Text>
             <TextInput
               style={[
                 styles.input,
                 {
-                  color: colors.text,
-                  backgroundColor: isDark ? "#2a2a2a" : "#f0f0f0",
+                  color: colors.textPrimary,
+                  backgroundColor: colors.surface2,
                   borderColor: colors.border,
                 },
               ]}
               placeholder="e.g. Upper Body Day"
-              placeholderTextColor={isDark ? "#666" : "#999"}
+              placeholderTextColor={colors.textTertiary}
               value={name}
               onChangeText={setName}
               autoFocus
@@ -214,7 +214,7 @@ export function CreateTemplateModal({
 
           {/* Category */}
           <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.text }]}>Category</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Category</Text>
             <View style={styles.categoryRow}>
               {CATEGORIES.map((cat) => (
                 <TouchableOpacity
@@ -224,12 +224,10 @@ export function CreateTemplateModal({
                     {
                       backgroundColor:
                         category === cat
-                          ? colors.tint
-                          : isDark
-                            ? "#2a2a2a"
-                            : "#f0f0f0",
+                          ? colors.accent
+                          : colors.surface2,
                       borderColor:
-                        category === cat ? colors.tint : colors.border,
+                        category === cat ? colors.accent : colors.border,
                     },
                   ]}
                   onPress={() => setCategory(cat)}
@@ -238,7 +236,7 @@ export function CreateTemplateModal({
                     style={[
                       styles.categoryChipText,
                       {
-                        color: category === cat ? "#fff" : colors.text,
+                        color: category === cat ? "#fff" : colors.textPrimary,
                       },
                     ]}
                   >
@@ -251,7 +249,7 @@ export function CreateTemplateModal({
 
           {/* Notes */}
           <View style={styles.section}>
-            <Text style={[styles.label, { color: colors.text }]}>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>
               Notes (optional)
             </Text>
             <TextInput
@@ -259,13 +257,13 @@ export function CreateTemplateModal({
                 styles.input,
                 styles.notesInput,
                 {
-                  color: colors.text,
-                  backgroundColor: isDark ? "#2a2a2a" : "#f0f0f0",
+                  color: colors.textPrimary,
+                  backgroundColor: colors.surface2,
                   borderColor: colors.border,
                 },
               ]}
               placeholder="Add notes about this template..."
-              placeholderTextColor={isDark ? "#666" : "#999"}
+              placeholderTextColor={colors.textTertiary}
               value={notes}
               onChangeText={setNotes}
               multiline
@@ -276,11 +274,11 @@ export function CreateTemplateModal({
           {/* Exercises */}
           <View style={styles.section}>
             <View style={styles.exercisesHeader}>
-              <Text style={[styles.label, { color: colors.text }]}>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>
                 Exercises ({exercises.length})
               </Text>
               <TouchableOpacity
-                style={[styles.addButton, { backgroundColor: colors.tint }]}
+                style={[styles.addButton, { backgroundColor: colors.accent }]}
                 onPress={() => setShowExercisePicker(true)}
               >
                 <IconSymbol size={16} name="plus" color="#fff" />
@@ -292,13 +290,13 @@ export function CreateTemplateModal({
               <View
                 style={[
                   styles.emptyExercises,
-                  { backgroundColor: isDark ? "#2a2a2a" : "#f0f0f0" },
+                  { backgroundColor: colors.surface2 },
                 ]}
               >
                 <Text
                   style={[
                     styles.emptyExercisesText,
-                    { color: isDark ? "#666" : "#999" },
+                    { color: colors.textTertiary },
                   ]}
                 >
                   No exercises added yet.{"\n"}Tap "Add" to select exercises.
@@ -312,19 +310,19 @@ export function CreateTemplateModal({
                     style={[
                       styles.exerciseItem,
                       {
-                        backgroundColor: isDark ? "#2a2a2a" : "#f0f0f0",
+                        backgroundColor: colors.surface2,
                         borderColor: colors.border,
                       },
                     ]}
                   >
                     <View style={styles.exerciseInfo}>
                       <Text
-                        style={[styles.exerciseOrder, { color: colors.tint }]}
+                        style={[styles.exerciseOrder, { color: colors.accent }]}
                       >
                         {index + 1}
                       </Text>
                       <Text
-                        style={[styles.exerciseName, { color: colors.text }]}
+                        style={[styles.exerciseName, { color: colors.textPrimary }]}
                       >
                         {exercise.name}
                       </Text>
@@ -336,7 +334,7 @@ export function CreateTemplateModal({
                       <IconSymbol
                         size={20}
                         name="xmark.circle.fill"
-                        color={isDark ? "#666" : "#999"}
+                        color={colors.textTertiary}
                       />
                     </TouchableOpacity>
                   </View>

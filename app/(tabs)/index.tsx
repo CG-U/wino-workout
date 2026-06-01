@@ -141,7 +141,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={styles.header}>
           <ThemedText type="title">Ready to Train?</ThemedText>
-          <Text style={[styles.subtitle, { color: isDark ? "#999" : "#666" }]}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Start a workout or continue your journey
           </Text>
         </View>
@@ -156,7 +156,7 @@ export default function HomeScreen() {
 
         {/* Quick Stats */}
         <View style={styles.statsSection}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
             Quick Stats
           </Text>
           <View style={styles.statsGrid}>
@@ -164,17 +164,17 @@ export default function HomeScreen() {
               style={[
                 styles.statCard,
                 {
-                  backgroundColor: isDark ? "#1a1a1a" : "#fff",
+                  backgroundColor: colors.surface1,
                   borderColor: colors.border,
                 },
               ]}
             >
-              <IconSymbol size={28} name="dumbbell" color="#007AFF" />
-              <Text style={[styles.statValue, { color: colors.text }]}>
+              <IconSymbol size={28} name="dumbbell" color={colors.accent} />
+              <Text style={[styles.statValue, { color: colors.textPrimary }]}>
                 {totalWorkouts}
               </Text>
               <Text
-                style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}
+                style={[styles.statLabel, { color: colors.textSecondary }]}
               >
                 Total Workouts
               </Text>
@@ -184,17 +184,17 @@ export default function HomeScreen() {
               style={[
                 styles.statCard,
                 {
-                  backgroundColor: isDark ? "#1a1a1a" : "#fff",
+                  backgroundColor: colors.surface1,
                   borderColor: colors.border,
                 },
               ]}
             >
-              <IconSymbol size={28} name="calendar" color="#34C759" />
-              <Text style={[styles.statValue, { color: colors.text }]}>
+              <IconSymbol size={28} name="calendar" color={colors.success} />
+              <Text style={[styles.statValue, { color: colors.textPrimary }]}>
                 {lastWorkoutDate}
               </Text>
               <Text
-                style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}
+                style={[styles.statLabel, { color: colors.textSecondary }]}
               >
                 Last Workout
               </Text>
@@ -204,17 +204,17 @@ export default function HomeScreen() {
               style={[
                 styles.statCard,
                 {
-                  backgroundColor: isDark ? "#1a1a1a" : "#fff",
+                  backgroundColor: colors.surface1,
                   borderColor: colors.border,
                 },
               ]}
             >
-              <IconSymbol size={28} name="chart.bar.fill" color="#FF9500" />
-              <Text style={[styles.statValue, { color: colors.text }]}>
+              <IconSymbol size={28} name="chart.bar.fill" color={colors.warning} />
+              <Text style={[styles.statValue, { color: colors.textPrimary }]}>
                 {weekVolume.toFixed(0)} kg
               </Text>
               <Text
-                style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}
+                style={[styles.statLabel, { color: colors.textSecondary }]}
               >
                 This Week
               </Text>
@@ -225,7 +225,7 @@ export default function HomeScreen() {
         {/* Recently Used Templates */}
         {recentTemplates.length > 0 && (
           <View style={styles.recentSection}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
               Recently Used
             </Text>
             {recentTemplates.map((item) => (
@@ -248,15 +248,15 @@ export default function HomeScreen() {
             <IconSymbol
               size={64}
               name="dumbbell"
-              color={isDark ? "#666" : "#999"}
+              color={colors.textTertiary}
             />
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>
+            <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
               Welcome to Wino Workout!
             </Text>
             <Text
               style={[
                 styles.emptySubtitle,
-                { color: isDark ? "#999" : "#666" },
+                { color: colors.textSecondary },
               ]}
             >
               Tap &quot;Start Workout&quot; above to begin your fitness journey.

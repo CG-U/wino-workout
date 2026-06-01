@@ -59,7 +59,7 @@ export function ExerciseDetail({
   return (
     <View style={styles.container}>
       {/* Exercise Name */}
-      <Text style={[styles.exerciseName, { color: colors.text }]}>
+      <Text style={[styles.exerciseName, { color: colors.textPrimary }]}>
         {exercise.name}
       </Text>
 
@@ -69,21 +69,21 @@ export function ExerciseDetail({
           style={[
             styles.lastPerformanceContainer,
             {
-              backgroundColor: isDark ? "#1a3a1a" : "#e8f5e9",
-              borderColor: "#34C759",
+              backgroundColor: colors.successSubtle,
+              borderColor: colors.success,
             },
           ]}
         >
           <IconSymbol
             size={16}
             name="chart.line.uptrend.xyaxis"
-            color="#34C759"
+            color={colors.success}
           />
           <View style={styles.lastPerformanceText}>
-            <Text style={[styles.lastPerformanceLabel, { color: "#34C759" }]}>
+            <Text style={[styles.lastPerformanceLabel, { color: colors.success }]}>
               Last time:
             </Text>
-            <Text style={[styles.lastPerformanceValue, { color: colors.text }]}>
+            <Text style={[styles.lastPerformanceValue, { color: colors.textPrimary }]}>
               {exercise.lastPerformance.sets
                 .map((s) => `${s.reps}×${s.weight}`)
                 .join(", ")}{" "}
@@ -92,7 +92,7 @@ export function ExerciseDetail({
             <Text
               style={[
                 styles.lastPerformanceDate,
-                { color: isDark ? "#666" : "#999" },
+                { color: colors.textTertiary },
               ]}
             >
               • {new Date(exercise.lastPerformance.date).toLocaleDateString()}
@@ -104,22 +104,22 @@ export function ExerciseDetail({
       {/* Sets Table Header */}
       <View style={styles.tableHeader}>
         <View style={styles.tableHeaderSetColumn}>
-          <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+          <Text style={[styles.tableHeaderText, { color: colors.textSecondary }]}>
             SET
           </Text>
         </View>
         <View style={styles.tableHeaderInputColumn}>
-          <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+          <Text style={[styles.tableHeaderText, { color: colors.textSecondary }]}>
             REPS
           </Text>
         </View>
         <View style={styles.tableHeaderInputColumn}>
-          <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+          <Text style={[styles.tableHeaderText, { color: colors.textSecondary }]}>
             WEIGHT (KG)
           </Text>
         </View>
         <View style={styles.tableHeaderActionsColumn}>
-          <Text style={[styles.tableHeaderText, { color: colors.text }]}>
+          <Text style={[styles.tableHeaderText, { color: colors.textSecondary }]}>
             VOLUME
           </Text>
         </View>
@@ -132,7 +132,7 @@ export function ExerciseDetail({
           style={[
             styles.setRowContainer,
             {
-              backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5",
+              backgroundColor: colors.surface1,
               borderColor: colors.border,
             },
           ]}
@@ -140,7 +140,7 @@ export function ExerciseDetail({
           <View style={styles.setRow}>
             {/* Set Number - Centered */}
             <View style={styles.setNumberColumn}>
-              <Text style={[styles.setNumberText, { color: colors.text }]}>
+              <Text style={[styles.setNumberText, { color: colors.textPrimary }]}>
                 {index + 1}
               </Text>
             </View>
@@ -152,22 +152,22 @@ export function ExerciseDetail({
                   styles.setInput,
                   {
                     borderColor: colors.border,
-                    backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                    color: colors.text,
+                    backgroundColor: colors.surface2,
+                    color: colors.textPrimary,
                   },
                 ]}
                 value={set.reps}
                 onChangeText={(value) => onUpdateSet(set.id, "reps", value)}
                 keyboardType="number-pad"
                 placeholder="0"
-                placeholderTextColor={isDark ? "#666" : "#999"}
+                placeholderTextColor={colors.textTertiary}
               />
               <View style={styles.stepperRow}>
                 <TouchableOpacity
                   style={[
                     styles.stepperSquareButton,
                     {
-                      backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                      backgroundColor: colors.surface2,
                       borderColor: colors.border,
                     },
                   ]}
@@ -175,13 +175,13 @@ export function ExerciseDetail({
                   accessibilityLabel="Decrease reps"
                   accessibilityRole="button"
                 >
-                  <IconSymbol size={18} name="minus" color={colors.tint} />
+                  <IconSymbol size={18} name="minus" color={colors.accent} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
                     styles.stepperSquareButton,
                     {
-                      backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                      backgroundColor: colors.surface2,
                       borderColor: colors.border,
                     },
                   ]}
@@ -189,7 +189,7 @@ export function ExerciseDetail({
                   accessibilityLabel="Increase reps"
                   accessibilityRole="button"
                 >
-                  <IconSymbol size={18} name="plus" color={colors.tint} />
+                  <IconSymbol size={18} name="plus" color={colors.accent} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -201,22 +201,22 @@ export function ExerciseDetail({
                   styles.setInput,
                   {
                     borderColor: colors.border,
-                    backgroundColor: isDark ? "#2a2a2a" : "#fff",
-                    color: colors.text,
+                    backgroundColor: colors.surface2,
+                    color: colors.textPrimary,
                   },
                 ]}
                 value={set.weight}
                 onChangeText={(value) => onUpdateSet(set.id, "weight", value)}
                 keyboardType="decimal-pad"
                 placeholder="0"
-                placeholderTextColor={isDark ? "#666" : "#999"}
+                placeholderTextColor={colors.textTertiary}
               />
               <View style={styles.stepperRow}>
                 <TouchableOpacity
                   style={[
                     styles.stepperSquareButton,
                     {
-                      backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                      backgroundColor: colors.surface2,
                       borderColor: colors.border,
                     },
                   ]}
@@ -224,13 +224,13 @@ export function ExerciseDetail({
                   accessibilityLabel="Decrease weight"
                   accessibilityRole="button"
                 >
-                  <IconSymbol size={18} name="minus" color={colors.tint} />
+                  <IconSymbol size={18} name="minus" color={colors.accent} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[
                     styles.stepperSquareButton,
                     {
-                      backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                      backgroundColor: colors.surface2,
                       borderColor: colors.border,
                     },
                   ]}
@@ -238,7 +238,7 @@ export function ExerciseDetail({
                   accessibilityLabel="Increase weight"
                   accessibilityRole="button"
                 >
-                  <IconSymbol size={18} name="plus" color={colors.tint} />
+                  <IconSymbol size={18} name="plus" color={colors.accent} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -247,7 +247,7 @@ export function ExerciseDetail({
             <View style={styles.actionsColumn}>
               {/* Volume Display */}
               <View style={styles.volumeDisplay}>
-                <Text style={[styles.volumeText, { color: colors.text }]}>
+                <Text style={[styles.volumeText, { color: colors.textPrimary }]}>
                   {set.reps && set.weight
                     ? `${(parseFloat(set.reps) * parseFloat(set.weight)).toFixed(1)}`
                     : "—"}
@@ -255,7 +255,7 @@ export function ExerciseDetail({
                 <Text
                   style={[
                     styles.volumeLabel,
-                    { color: isDark ? "#666" : "#999" },
+                    { color: colors.textTertiary },
                   ]}
                 >
                   kg
@@ -265,7 +265,7 @@ export function ExerciseDetail({
                 style={[
                   styles.deleteButton,
                   {
-                    backgroundColor: isDark ? "#2a2a2a" : "#fff",
+                    backgroundColor: colors.destructiveSubtle,
                     borderColor: colors.border,
                   },
                 ]}
@@ -273,7 +273,7 @@ export function ExerciseDetail({
                 accessibilityLabel="Delete set"
                 accessibilityRole="button"
               >
-                <IconSymbol size={18} name="trash" color="#FF3B30" />
+                <IconSymbol size={18} name="trash" color={colors.destructive} />
               </TouchableOpacity>
             </View>
           </View>
@@ -285,25 +285,25 @@ export function ExerciseDetail({
         style={[
           styles.addSetButton,
           {
-            borderColor: colors.tint,
-            backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5",
+            borderColor: colors.accent,
+            backgroundColor: colors.accentSubtle,
           },
         ]}
         onPress={onAddSet}
       >
-        <IconSymbol size={20} name="plus.circle.fill" color={colors.tint} />
-        <Text style={[styles.addSetText, { color: colors.tint }]}>Add Set</Text>
+        <IconSymbol size={20} name="plus.circle.fill" color={colors.accent} />
+        <Text style={[styles.addSetText, { color: colors.accent }]}>Add Set</Text>
       </TouchableOpacity>
 
       {/* Notes */}
       {exercise.notes && (
         <View style={styles.notesContainer}>
           <Text
-            style={[styles.notesLabel, { color: isDark ? "#999" : "#666" }]}
+            style={[styles.notesLabel, { color: colors.textSecondary }]}
           >
             Notes:
           </Text>
-          <Text style={[styles.notesText, { color: colors.text }]}>
+          <Text style={[styles.notesText, { color: colors.textPrimary }]}>
             {exercise.notes}
           </Text>
         </View>

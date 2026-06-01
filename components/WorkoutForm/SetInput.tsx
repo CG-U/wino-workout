@@ -41,31 +41,31 @@ export function SetInput({
       style={[
         styles.container,
         {
-          backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+          backgroundColor: colors.surface2,
           borderColor: colors.border,
         },
       ]}
     >
       <View style={styles.setNumber}>
-        <Text style={[styles.setNumberText, { color: colors.text }]}>
+        <Text style={[styles.setNumberText, { color: colors.textPrimary }]}>
           Set {setNumber}
         </Text>
       </View>
 
       <View style={styles.inputContainer}>
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Reps</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Reps</Text>
           <TextInput
             style={[
               styles.input,
               {
                 borderColor: colors.border,
-                color: colors.text,
-                backgroundColor: isDark ? "#1a1a1a" : "#fff",
+                color: colors.textPrimary,
+                backgroundColor: colors.surface1,
               },
             ]}
             placeholder="0"
-            placeholderTextColor={isDark ? "#666" : "#999"}
+            placeholderTextColor={colors.textTertiary}
             keyboardType="number-pad"
             value={reps}
             onChangeText={onRepsChange}
@@ -73,7 +73,7 @@ export function SetInput({
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>
             Weight (kg)
           </Text>
           <TextInput
@@ -81,12 +81,12 @@ export function SetInput({
               styles.input,
               {
                 borderColor: colors.border,
-                color: colors.text,
-                backgroundColor: isDark ? "#1a1a1a" : "#fff",
+                color: colors.textPrimary,
+                backgroundColor: colors.surface1,
               },
             ]}
             placeholder="0"
-            placeholderTextColor={isDark ? "#666" : "#999"}
+            placeholderTextColor={colors.textTertiary}
             keyboardType="decimal-pad"
             value={weight}
             onChangeText={onWeightChange}
@@ -98,7 +98,7 @@ export function SetInput({
           onPress={onDelete}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <IconSymbol size={20} name="trash" color="#FF3B30" />
+          <IconSymbol size={20} name="trash" color={colors.destructive} />
         </TouchableOpacity>
       </View>
     </View>

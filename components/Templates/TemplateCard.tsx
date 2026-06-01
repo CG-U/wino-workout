@@ -38,13 +38,13 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
   const getCategoryColor = () => {
     switch (template.category) {
       case "PPL":
-        return "#007AFF";
+        return "#3B82F6";
       case "Bro Split":
-        return "#FF9500";
+        return "#F59E0B";
       case "Full Body":
-        return "#34C759";
+        return "#22C55E";
       default:
-        return colors.tint;
+        return colors.accent;
     }
   };
 
@@ -53,7 +53,7 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
       style={[
         styles.card,
         {
-          backgroundColor: isDark ? "#1a1a1a" : "#fff",
+          backgroundColor: colors.surface1,
           borderColor: colors.border,
         },
       ]}
@@ -77,13 +77,13 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
           </View>
 
           <View style={styles.textContent}>
-            <Text style={[styles.title, { color: colors.text }]}>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>
               {template.name}
             </Text>
             <Text
               style={[
                 styles.exerciseCount,
-                { color: isDark ? "#999" : "#666" },
+                { color: colors.textSecondary },
               ]}
             >
               {template.exercises.length} exercise
@@ -94,7 +94,7 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
 
         {/* Right side */}
         <View style={styles.rightContent}>
-          <IconSymbol size={20} name="chevron.right" color={colors.icon} />
+          <IconSymbol size={20} name="chevron.right" color={colors.textTertiary} />
         </View>
       </View>
     </TouchableOpacity>

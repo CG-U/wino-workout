@@ -139,20 +139,20 @@ export function ExercisePickerModal({
       <View
         style={[
           styles.container,
-          { backgroundColor: isDark ? "#151718" : "#fff" },
+          { backgroundColor: colors.background },
         ]}
       >
         {/* Header */}
         <View style={[styles.header, { paddingTop: insets.top }]}>
           <View style={styles.headerContent}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>
+            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
               Select Exercise
             </Text>
             <TouchableOpacity
               onPress={onClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <IconSymbol size={24} name="chevron.right" color={colors.text} />
+              <IconSymbol size={24} name="chevron.right" color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -162,12 +162,12 @@ export function ExercisePickerModal({
               styles.searchInput,
               {
                 borderColor: colors.border,
-                backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
-                color: colors.text,
+                backgroundColor: colors.surface2,
+                color: colors.textPrimary,
               },
             ]}
             placeholder="Search exercises..."
-            placeholderTextColor={isDark ? "#666" : "#999"}
+            placeholderTextColor={colors.textTertiary}
             value={searchText}
             onChangeText={setSearchText}
           />
@@ -177,12 +177,12 @@ export function ExercisePickerModal({
         {filteredExercises.length === 0 && !canAddCustom ? (
           <View style={styles.emptyContainer}>
             <Text
-              style={[styles.emptyText, { color: isDark ? "#999" : "#666" }]}
+              style={[styles.emptyText, { color: colors.textSecondary }]}
             >
               No matching exercises
             </Text>
             <Text
-              style={[styles.emptySubtext, { color: isDark ? "#666" : "#999" }]}
+              style={[styles.emptySubtext, { color: colors.textTertiary }]}
             >
               Try a different search term
             </Text>
@@ -195,19 +195,19 @@ export function ExercisePickerModal({
                 style={[
                   styles.exerciseItem,
                   {
-                    backgroundColor: isDark ? "#1a1a1a" : "#fff",
+                    backgroundColor: colors.surface1,
                     borderBottomColor: colors.border,
                   },
                 ]}
                 onPress={() => handleSelect(exercise)}
               >
-                <Text style={[styles.exerciseName, { color: colors.text }]}>
+                <Text style={[styles.exerciseName, { color: colors.textPrimary }]}>
                   {exercise}
                 </Text>
                 <IconSymbol
                   size={20}
                   name="chevron.right"
-                  color={colors.tint}
+                  color={colors.textTertiary}
                 />
               </TouchableOpacity>
             )}
@@ -219,8 +219,8 @@ export function ExercisePickerModal({
                   style={[
                     styles.addCustomItem,
                     {
-                      backgroundColor: isDark ? "#1a2a1a" : "#f0faf0",
-                      borderColor: colors.tint,
+                      backgroundColor: colors.accentSubtle,
+                      borderColor: colors.accent,
                     },
                   ]}
                   onPress={handleAddCustom}
@@ -229,10 +229,10 @@ export function ExercisePickerModal({
                     <IconSymbol
                       size={20}
                       name="plus.circle.fill"
-                      color={colors.tint}
+                      color={colors.accent}
                     />
                     <Text
-                      style={[styles.addCustomText, { color: colors.tint }]}
+                      style={[styles.addCustomText, { color: colors.accent }]}
                     >
                       Add "{trimmedSearch}"
                     </Text>
@@ -240,7 +240,7 @@ export function ExercisePickerModal({
                   <IconSymbol
                     size={16}
                     name="chevron.right"
-                    color={colors.tint}
+                    color={colors.accent}
                   />
                 </TouchableOpacity>
               ) : null

@@ -9,12 +9,40 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 
 import { seedDefaultTemplates } from "@/constants/defaultTemplates";
+import { Colors } from "@/constants/theme";
 import { WorkoutProvider } from "@/contexts/WorkoutContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { initializeDatabase } from "@/lib/database/db";
 
 export const unstable_settings = {
   anchor: "(tabs)",
+};
+
+// Custom navigation themes aligned with our color system
+const AppDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Colors.dark.accent,
+    background: Colors.dark.background,
+    card: Colors.dark.surface1,
+    text: Colors.dark.textPrimary,
+    border: Colors.dark.border,
+    notification: Colors.dark.accent,
+  },
+};
+
+const AppLightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: Colors.light.accent,
+    background: Colors.light.background,
+    card: Colors.light.surface1,
+    text: Colors.light.textPrimary,
+    border: Colors.light.border,
+    notification: Colors.light.accent,
+  },
 };
 
 export default function RootLayout() {
@@ -42,7 +70,9 @@ export default function RootLayout() {
 
   return (
     <WorkoutProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <ThemeProvider
+        value={colorScheme === "dark" ? AppDarkTheme : AppLightTheme}
+      >
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen

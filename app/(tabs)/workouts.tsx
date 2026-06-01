@@ -142,7 +142,7 @@ export default function WorkoutsScreen() {
         style={[
           styles.workoutCard,
           {
-            backgroundColor: isDark ? "#1a1a1a" : "#fff",
+            backgroundColor: colors.surface1,
             borderColor: colors.border,
           },
         ]}
@@ -151,15 +151,15 @@ export default function WorkoutsScreen() {
         <View style={styles.cardContent}>
           <View style={styles.dateSection}>
             {workout.templateName && (
-              <Text style={[styles.templateName, { color: colors.tint }]}>
+              <Text style={[styles.templateName, { color: colors.accent }]}>
                 {workout.templateName}
               </Text>
             )}
-            <Text style={[styles.date, { color: colors.text }]}>
+            <Text style={[styles.date, { color: colors.textPrimary }]}>
               {formattedDate}
             </Text>
             <Text
-              style={[styles.dateSubtext, { color: isDark ? "#999" : "#666" }]}
+              style={[styles.dateSubtext, { color: colors.textSecondary }]}
             >
               {workout.exerciseCount} exercise
               {workout.exerciseCount !== 1 ? "s" : ""} •{" "}
@@ -176,14 +176,14 @@ export default function WorkoutsScreen() {
               <IconSymbol
                 size={20}
                 name="plus.circle.fill"
-                color={colors.tint}
+                color={colors.accent}
               />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() => handleDeleteWorkout(workout)}
             >
-              <IconSymbol size={20} name="trash" color="#FF3B30" />
+              <IconSymbol size={20} name="trash" color={colors.destructive} />
             </TouchableOpacity>
           </View>
         </View>
@@ -193,13 +193,13 @@ export default function WorkoutsScreen() {
           <View style={styles.exercisesSection}>
             {workout.exercises.slice(0, 3).map((exercise, index) => (
               <View key={exercise.id} style={styles.exerciseSummary}>
-                <Text style={[styles.exerciseName, { color: colors.text }]}>
+                <Text style={[styles.exerciseName, { color: colors.textPrimary }]}>
                   • {exercise.name}
                 </Text>
                 <Text
                   style={[
                     styles.exerciseStats,
-                    { color: isDark ? "#999" : "#666" },
+                    { color: colors.textSecondary },
                   ]}
                 >
                   {exercise.sets.length} set
@@ -212,7 +212,7 @@ export default function WorkoutsScreen() {
               <Text
                 style={[
                   styles.moreExercises,
-                  { color: isDark ? "#999" : "#666" },
+                  { color: colors.textSecondary },
                 ]}
               >
                 +{workout.exercises.length - 3} more
@@ -224,7 +224,7 @@ export default function WorkoutsScreen() {
         {/* Notes */}
         {workout.notes && (
           <View style={styles.notesSection}>
-            <Text style={[styles.notes, { color: isDark ? "#999" : "#666" }]}>
+            <Text style={[styles.notes, { color: colors.textSecondary }]}>
               &ldquo;{workout.notes}&rdquo;
             </Text>
           </View>
@@ -235,11 +235,11 @@ export default function WorkoutsScreen() {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <IconSymbol size={48} name="dumbbell" color={isDark ? "#666" : "#999"} />
-      <Text style={[styles.emptyText, { color: isDark ? "#999" : "#666" }]}>
+      <IconSymbol size={48} name="dumbbell" color={colors.textTertiary} />
+      <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
         No workouts yet
       </Text>
-      <Text style={[styles.emptySubtext, { color: isDark ? "#666" : "#999" }]}>
+      <Text style={[styles.emptySubtext, { color: colors.textTertiary }]}>
         Start logging your workouts to track progress
       </Text>
     </View>
@@ -249,7 +249,7 @@ export default function WorkoutsScreen() {
     <StandardView style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <ThemedText type="title">Workouts</ThemedText>
-        <Text style={[styles.subtitle, { color: isDark ? "#999" : "#666" }]}>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           {workouts.length} workout{workouts.length !== 1 ? "s" : ""}
         </Text>
       </View>

@@ -43,19 +43,19 @@ export default function DashboardScreen() {
       style={[
         styles.statCard,
         {
-          backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+          backgroundColor: colors.surface1,
           borderColor: colors.border,
         },
       ]}
     >
-      <IconSymbol size={24} name={icon} color={colors.tint} />
-      <Text style={[styles.statLabel, { color: isDark ? "#999" : "#666" }]}>
+      <IconSymbol size={24} name={icon} color={colors.accent} />
+      <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
         {label}
       </Text>
       <View style={styles.statValue}>
-        <Text style={[styles.statNumber, { color: colors.text }]}>{value}</Text>
+        <Text style={[styles.statNumber, { color: colors.textPrimary }]}>{value}</Text>
         {unit && (
-          <Text style={[styles.statUnit, { color: isDark ? "#999" : "#666" }]}>
+          <Text style={[styles.statUnit, { color: colors.textSecondary }]}>
             {unit}
           </Text>
         )}
@@ -64,7 +64,7 @@ export default function DashboardScreen() {
   );
 
   const SectionTitle = ({ title }: { title: string }) => (
-    <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
+    <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{title}</Text>
   );
 
   return (
@@ -80,7 +80,7 @@ export default function DashboardScreen() {
         {/* Header */}
         <View style={styles.header}>
           <ThemedText type="title">Dashboard</ThemedText>
-          <Text style={[styles.subtitle, { color: isDark ? "#999" : "#666" }]}>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             Your workout progress and stats
           </Text>
         </View>
@@ -90,15 +90,15 @@ export default function DashboardScreen() {
             <IconSymbol
               size={48}
               name="chart.bar.fill"
-              color={isDark ? "#666" : "#999"}
+              color={colors.textTertiary}
             />
             <Text
-              style={[styles.emptyText, { color: isDark ? "#999" : "#666" }]}
+              style={[styles.emptyText, { color: colors.textSecondary }]}
             >
               No data yet
             </Text>
             <Text
-              style={[styles.emptySubtext, { color: isDark ? "#666" : "#999" }]}
+              style={[styles.emptySubtext, { color: colors.textTertiary }]}
             >
               Log some workouts to see your progress
             </Text>
@@ -138,7 +138,7 @@ export default function DashboardScreen() {
                 style={[
                   styles.infoCard,
                   {
-                    backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+                    backgroundColor: colors.surface1,
                     borderColor: colors.border,
                   },
                 ]}
@@ -147,12 +147,12 @@ export default function DashboardScreen() {
                   <Text
                     style={[
                       styles.infoLabel,
-                      { color: isDark ? "#999" : "#666" },
+                      { color: colors.textSecondary },
                     ]}
                   >
                     Avg. Volume per Workout
                   </Text>
-                  <Text style={[styles.infoValue, { color: colors.text }]}>
+                  <Text style={[styles.infoValue, { color: colors.textPrimary }]}>
                     {stats.averageVolumePerWorkout.toFixed(1)} kg
                   </Text>
                 </View>
@@ -169,7 +169,7 @@ export default function DashboardScreen() {
                     style={[
                       styles.exerciseItem,
                       {
-                        backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+                        backgroundColor: colors.surface1,
                         borderColor: colors.border,
                       },
                     ]}
@@ -181,14 +181,14 @@ export default function DashboardScreen() {
                     </View>
                     <View style={styles.exerciseInfo}>
                       <Text
-                        style={[styles.exerciseName, { color: colors.text }]}
+                        style={[styles.exerciseName, { color: colors.textPrimary }]}
                       >
                         {exercise.name}
                       </Text>
                       <Text
                         style={[
                           styles.exerciseStats,
-                          { color: isDark ? "#999" : "#666" },
+                          { color: colors.textSecondary },
                         ]}
                       >
                         {exercise.totalSets} sets • {exercise.totalReps} reps •{" "}
@@ -199,12 +199,12 @@ export default function DashboardScreen() {
                       <Text
                         style={[
                           styles.maxWeightLabel,
-                          { color: isDark ? "#999" : "#666" },
+                          { color: colors.textTertiary },
                         ]}
                       >
                         Max
                       </Text>
-                      <Text style={[styles.maxWeight, { color: colors.tint }]}>
+                      <Text style={[styles.maxWeight, { color: colors.accent }]}>
                         {exercise.maxWeight.toFixed(1)} kg
                       </Text>
                     </View>
@@ -223,32 +223,32 @@ export default function DashboardScreen() {
                     style={[
                       styles.prItem,
                       {
-                        backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+                        backgroundColor: colors.surface1,
                         borderColor: colors.border,
                       },
                     ]}
                   >
                     <View style={styles.prContent}>
-                      <Text style={[styles.prName, { color: colors.text }]}>
+                      <Text style={[styles.prName, { color: colors.textPrimary }]}>
                         {pr.exerciseName}
                       </Text>
                       <Text
                         style={[
                           styles.prDate,
-                          { color: isDark ? "#999" : "#666" },
+                          { color: colors.textSecondary },
                         ]}
                       >
                         {new Date(pr.date).toLocaleDateString()}
                       </Text>
                     </View>
                     <View style={styles.prValue}>
-                      <Text style={[styles.prNumber, { color: colors.tint }]}>
+                      <Text style={[styles.prNumber, { color: colors.accent }]}>
                         {pr.maxWeight.toFixed(1)} kg
                       </Text>
                       <Text
                         style={[
                           styles.prReps,
-                          { color: isDark ? "#999" : "#666" },
+                          { color: colors.textSecondary },
                         ]}
                       >
                         × {pr.reps}
@@ -269,13 +269,13 @@ export default function DashboardScreen() {
                     style={[
                       styles.frequencyItem,
                       {
-                        backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+                        backgroundColor: colors.surface1,
                         borderColor: colors.border,
                       },
                     ]}
                   >
                     <Text
-                      style={[styles.frequencyName, { color: colors.text }]}
+                      style={[styles.frequencyName, { color: colors.textPrimary }]}
                     >
                       {item.name}
                     </Text>
@@ -285,7 +285,7 @@ export default function DashboardScreen() {
                           styles.frequencyBarFill,
                           {
                             width: `${(item.count / stats.exerciseFrequency[0].count) * 100}%`,
-                            backgroundColor: colors.tint,
+                            backgroundColor: colors.accent,
                           },
                         ]}
                       />
@@ -293,7 +293,7 @@ export default function DashboardScreen() {
                     <Text
                       style={[
                         styles.frequencyCount,
-                        { color: isDark ? "#999" : "#666" },
+                        { color: colors.textSecondary },
                       ]}
                     >
                       {item.count}x
@@ -311,7 +311,7 @@ export default function DashboardScreen() {
                   style={[
                     styles.weekCard,
                     {
-                      backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+                      backgroundColor: colors.surface1,
                       borderColor: colors.border,
                     },
                   ]}
@@ -337,18 +337,18 @@ export default function DashboardScreen() {
                     yAxisLabel=""
                     yAxisSuffix=" kg"
                     chartConfig={{
-                      backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
-                      backgroundGradientFrom: isDark ? "#2a2a2a" : "#f5f5f5",
-                      backgroundGradientTo: isDark ? "#2a2a2a" : "#f5f5f5",
+                      backgroundColor: colors.surface1,
+                      backgroundGradientFrom: colors.surface1,
+                      backgroundGradientTo: colors.surface1,
                       decimalPlaces: 0,
-                      color: (opacity = 1) => colors.tint,
-                      labelColor: (opacity = 1) => (isDark ? "#999" : "#666"),
+                      color: (opacity = 1) => colors.accent,
+                      labelColor: (opacity = 1) => colors.textSecondary,
                       style: {
                         borderRadius: 12,
                       },
                       propsForBackgroundLines: {
                         strokeDasharray: "",
-                        stroke: isDark ? "#3a3a3a" : "#e0e0e0",
+                        stroke: colors.border,
                         strokeWidth: 1,
                       },
                       propsForLabels: {
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#007AFF",
+    backgroundColor: "#3B82F6",
     justifyContent: "center",
     alignItems: "center",
   },

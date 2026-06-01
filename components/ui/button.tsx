@@ -35,16 +35,14 @@ export function PrimaryButton({
   style,
 }: PrimaryButtonProps) {
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const colors = Colors[colorScheme ?? "light"];
+  const colors = Colors[colorScheme ?? "dark"];
 
   return (
     <TouchableOpacity
       style={[
         styles.primaryButton,
         {
-          backgroundColor: isDark ? "#1a1a1a" : "#fff",
-          borderColor: colors.border,
+          backgroundColor: colors.accent,
         },
         disabled && styles.primaryButtonDisabled,
         style,
@@ -55,15 +53,14 @@ export function PrimaryButton({
     >
       {icon && (
         <IconSymbol
-          size={32}
+          size={24}
           name={icon}
-          color={disabled ? "#999" : colors.tint}
+          color={disabled ? "rgba(255,255,255,0.5)" : "#fff"}
         />
       )}
       <Text
         style={[
           styles.primaryButtonText,
-          { color: colors.tint },
           disabled && styles.primaryButtonTextDisabled,
         ]}
       >
@@ -93,15 +90,14 @@ export function SecondaryButton({
   style,
 }: SecondaryButtonProps) {
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const colors = Colors[colorScheme ?? "light"];
+  const colors = Colors[colorScheme ?? "dark"];
 
   return (
     <TouchableOpacity
       style={[
         styles.secondaryButton,
         {
-          backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5",
+          backgroundColor: colors.surface2,
           borderColor: colors.border,
         },
         disabled && styles.secondaryButtonDisabled,
@@ -115,14 +111,14 @@ export function SecondaryButton({
         <IconSymbol
           size={20}
           name={icon}
-          color={disabled ? "#999" : colors.text}
+          color={disabled ? colors.textTertiary : colors.textPrimary}
         />
       )}
       <Text
         style={[
           styles.secondaryButtonText,
-          { color: colors.text },
-          disabled && styles.secondaryButtonTextDisabled,
+          { color: colors.textPrimary },
+          disabled && { color: colors.textTertiary },
         ]}
       >
         {title}
@@ -155,15 +151,14 @@ export function CardButton({
   style,
 }: CardButtonProps) {
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const colors = Colors[colorScheme ?? "light"];
+  const colors = Colors[colorScheme ?? "dark"];
 
   return (
     <TouchableOpacity
       style={[
         styles.cardButton,
         {
-          backgroundColor: isDark ? "#1a1a1a" : "#fff",
+          backgroundColor: colors.surface1,
           borderColor: colors.border,
         },
         style,
@@ -176,23 +171,23 @@ export function CardButton({
           <View
             style={[
               styles.cardIcon,
-              { backgroundColor: (iconColor || colors.tint) + "20" },
+              { backgroundColor: colors.accentSubtle },
             ]}
           >
             <IconSymbol
               size={24}
               name={icon}
-              color={iconColor || colors.tint}
+              color={iconColor || colors.accent}
             />
           </View>
         )}
         <View style={styles.cardInfo}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
             {title}
           </Text>
           {subtitle && (
             <Text
-              style={[styles.cardSubtitle, { color: isDark ? "#999" : "#666" }]}
+              style={[styles.cardSubtitle, { color: colors.textSecondary }]}
             >
               {subtitle}
             </Text>
@@ -200,7 +195,7 @@ export function CardButton({
         </View>
       </View>
       {showChevron && (
-        <IconSymbol size={20} name="chevron.right" color={colors.icon} />
+        <IconSymbol size={20} name="chevron.right" color={colors.textTertiary} />
       )}
     </TouchableOpacity>
   );
@@ -228,7 +223,7 @@ export function IconButton({
   style,
 }: IconButtonProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? "light"];
+  const colors = Colors[colorScheme ?? "dark"];
 
   return (
     <TouchableOpacity
@@ -241,7 +236,7 @@ export function IconButton({
       <IconSymbol
         size={size}
         name={icon}
-        color={disabled ? "#999" : color || colors.text}
+        color={disabled ? colors.textTertiary : color || colors.textSecondary}
       />
     </TouchableOpacity>
   );
@@ -253,20 +248,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 12,
-    paddingVertical: 18,
-    borderRadius: 16,
-    borderWidth: 1,
+    gap: 10,
+    paddingVertical: 16,
+    borderRadius: 14,
   },
   primaryButtonText: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: 17,
+    fontWeight: "600",
+    color: "#fff",
   },
   primaryButtonDisabled: {
     opacity: 0.5,
   },
   primaryButtonTextDisabled: {
-    color: "#999",
+    opacity: 0.7,
   },
 
   // Secondary Button
@@ -277,7 +272,7 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 16,
+    borderRadius: 14,
     borderWidth: 1,
   },
   secondaryButtonText: {
@@ -286,9 +281,6 @@ const styles = StyleSheet.create({
   },
   secondaryButtonDisabled: {
     opacity: 0.5,
-  },
-  secondaryButtonTextDisabled: {
-    color: "#999",
   },
 
   // Card Button
@@ -299,7 +291,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 12,
     padding: 16,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   cardButtonContent: {
     flexDirection: "row",
@@ -307,9 +299,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,

@@ -62,27 +62,27 @@ export function ExerciseCard({
       style={[
         styles.container,
         {
-          backgroundColor: isDark ? "#1a1a1a" : "#fff",
+          backgroundColor: colors.surface1,
           borderColor: colors.border,
         },
       ]}
     >
       {/* Header with exercise number and delete button */}
       <View style={styles.header}>
-        <Text style={[styles.exerciseNumber, { color: colors.text }]}>
+        <Text style={[styles.exerciseNumber, { color: colors.textPrimary }]}>
           Exercise {exerciseNumber}
         </Text>
         <TouchableOpacity
           onPress={onDeleteExercise}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <IconSymbol size={20} name="trash" color="#FF3B30" />
+          <IconSymbol size={20} name="trash" color={colors.destructive} />
         </TouchableOpacity>
       </View>
 
       {/* Exercise name input */}
       <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>
           Exercise Name
         </Text>
         <TextInput
@@ -90,12 +90,12 @@ export function ExerciseCard({
             styles.input,
             {
               borderColor: colors.border,
-              color: colors.text,
-              backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+              color: colors.textPrimary,
+              backgroundColor: colors.surface2,
             },
           ]}
           placeholder="e.g., Bench Press"
-          placeholderTextColor={isDark ? "#666" : "#999"}
+          placeholderTextColor={colors.textTertiary}
           value={exercise.name}
           onChangeText={onExerciseNameChange}
         />
@@ -103,7 +103,7 @@ export function ExerciseCard({
 
       {/* Exercise notes input */}
       <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>
           Notes (optional)
         </Text>
         <TextInput
@@ -112,12 +112,12 @@ export function ExerciseCard({
             styles.notesInput,
             {
               borderColor: colors.border,
-              color: colors.text,
-              backgroundColor: isDark ? "#2a2a2a" : "#f5f5f5",
+              color: colors.textPrimary,
+              backgroundColor: colors.surface2,
             },
           ]}
           placeholder="Any notes about this exercise..."
-          placeholderTextColor={isDark ? "#666" : "#999"}
+          placeholderTextColor={colors.textTertiary}
           value={exercise.notes}
           onChangeText={onExerciseNotesChange}
           multiline
@@ -127,9 +127,9 @@ export function ExerciseCard({
 
       {/* Sets */}
       <View style={styles.setsContainer}>
-        <Text style={[styles.setsLabel, { color: colors.text }]}>Sets</Text>
+        <Text style={[styles.setsLabel, { color: colors.textSecondary }]}>Sets</Text>
         {exercise.sets.length === 0 ? (
-          <Text style={[styles.emptyText, { color: isDark ? "#666" : "#999" }]}>
+          <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
             No sets added yet
           </Text>
         ) : (
