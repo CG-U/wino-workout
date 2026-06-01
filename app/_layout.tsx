@@ -6,6 +6,7 @@ import {
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 import { seedDefaultTemplates } from "@/constants/defaultTemplates";
@@ -69,19 +70,21 @@ export default function RootLayout() {
   }
 
   return (
-    <WorkoutProvider>
-      <ThemeProvider
-        value={colorScheme === "dark" ? AppDarkTheme : AppLightTheme}
-      >
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modal"
-            options={{ presentation: "modal", title: "Modal" }}
-          />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </WorkoutProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <WorkoutProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? AppDarkTheme : AppLightTheme}
+        >
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="modal"
+              options={{ presentation: "modal", title: "Modal" }}
+            />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </WorkoutProvider>
+    </GestureHandlerRootView>
   );
 }

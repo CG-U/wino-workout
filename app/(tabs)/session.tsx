@@ -1,10 +1,15 @@
 /**
- * Session Tab Screen
- * Shows the active workout session or empty state
+ * Session Tab Screen (Redesigned)
+ * Full-screen swipeable workout session with live timer, pill bar navigation,
+ * set completion tracking, rest timer, and haptic feedback.
  */
 
-import { ExerciseDetail } from "@/components/Session/ExerciseDetail";
-import { ExerciseNavigator } from "@/components/Session/ExerciseNavigator";
+import { ExerciseDetail } from "@/components/Session/ExerciseDetailV2";
+import { ExercisePillBar } from "@/components/Session/ExercisePillBar";
+import {
+  RestTimerSheet,
+  RestTimerSheetRef,
+} from "@/components/Session/RestTimerSheet";
 import { PrimaryButton } from "@/components/ui/button";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { StandardView } from "@/components/ui/standard-view";
@@ -14,17 +19,107 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useWorkoutOperations } from "@/hooks/useWorkoutOperations";
 import { SessionSet } from "@/lib/database/schema";
 import * as Crypto from "expo-crypto";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Dimensions,
+  FlatList,
+  KeyboardAvoidingView,
+  LayoutAnimation,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
+  UIManager,
   View,
+  ViewToken,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Animated, {
+  FadeIn,
+  FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+// Enable LayoutAnimation on Android
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+
+// ---------- Live Timer Hook ----------
+
+function useLiveTimer(startedAt: number | undefined) {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!startedAt) return;
+    const update = () =>
+      setElapsed(Math.floor((Date.now() - startedAt) / 1000));
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [startedAt]);
+
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
+// ---------- Progress Segments ----------
+
+function ProgressSegments({
+  exercises,
+  completedSets,
+  colors,
+}: {
+  exercises: { templateExerciseId: string; sets: SessionSet[] }[];
+  completedSets: Set<string>;
+  colors: (typeof Colors)["dark"];
+}) {
+  return (
+    <View style={progressStyles.container}>
+      {exercises.map((ex) => {
+        const total = ex.sets.length;
+        const completed = ex.sets.filter((s) => completedSets.has(s.id)).length;
+        const hasAnyInput = ex.sets.some(
+          (s) =>
+            (s.reps && parseInt(s.reps) > 0) ||
+            (s.weight && parseFloat(s.weight) > 0),
+        );
+
+        let segmentColor = colors.surface3;
+        if (completed === total && total > 0) {
+          segmentColor = colors.success;
+        } else if (completed > 0 || hasAnyInput) {
+          segmentColor = colors.accent;
+        }
+
+        return (
+          <View
+            key={ex.templateExerciseId}
+            style={[
+              progressStyles.segment,
+              { backgroundColor: segmentColor },
+            ]}
+          />
+        );
+      })}
+    </View>
+  );
+}
+
+// ---------- Main Screen ----------
 
 export default function SessionScreen() {
   const router = useRouter();
@@ -36,105 +131,124 @@ export default function SessionScreen() {
   const { activeSession, dispatch } = useWorkout();
   const { saveWorkout } = useWorkoutOperations();
 
-  const [currentExerciseId, setCurrentExerciseId] = useState<string | null>(
-    null,
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [completedSets, setCompletedSets] = useState<Set<string>>(new Set());
+  const flatListRef = useRef<FlatList>(null);
+  const restTimerRef = useRef<RestTimerSheetRef>(null);
+
+  const elapsedTime = useLiveTimer(activeSession?.startedAt);
+
+  // Sync FlatList when pill bar is tapped
+  const scrollToIndex = useCallback((index: number) => {
+    flatListRef.current?.scrollToIndex({ index, animated: true });
+    setCurrentIndex(index);
+  }, []);
+
+  // Track visible exercise on swipe
+  const onViewableItemsChanged = useRef(
+    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      if (viewableItems.length > 0 && viewableItems[0].index != null) {
+        setCurrentIndex(viewableItems[0].index);
+      }
+    },
+  ).current;
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50,
+  }).current;
+
+  // ---------- Set Operations ----------
+
+  const handleUpdateSet = useCallback(
+    (exerciseId: string, setId: string, field: "reps" | "weight", value: string) => {
+      if (!activeSession) return;
+      const updatedExercises = activeSession.exercises.map((ex) => {
+        if (ex.templateExerciseId === exerciseId) {
+          return {
+            ...ex,
+            sets: ex.sets.map((s) =>
+              s.id === setId ? { ...s, [field]: value } : s,
+            ),
+          };
+        }
+        return ex;
+      });
+      dispatch({
+        type: "UPDATE_SESSION",
+        payload: { ...activeSession, exercises: updatedExercises },
+      });
+    },
+    [activeSession, dispatch],
   );
-  const [isNavigatorCollapsed, setIsNavigatorCollapsed] = useState(false);
 
-  useEffect(() => {
-    // Set initial exercise when session starts
-    if (
-      activeSession &&
-      activeSession.exercises.length > 0 &&
-      !currentExerciseId
-    ) {
-      setCurrentExerciseId(activeSession.exercises[0].templateExerciseId);
-    }
-  }, [activeSession, currentExerciseId]);
+  const handleAddSet = useCallback(
+    (exerciseId: string) => {
+      if (!activeSession) return;
+      const updatedExercises = activeSession.exercises.map((ex) => {
+        if (ex.templateExerciseId === exerciseId) {
+          const lastSet = ex.sets[ex.sets.length - 1];
+          const newSet: SessionSet = {
+            id: Crypto.randomUUID(),
+            reps: lastSet?.reps || "",
+            weight: lastSet?.weight || "",
+          };
+          return { ...ex, sets: [...ex.sets, newSet] };
+        }
+        return ex;
+      });
+      dispatch({
+        type: "UPDATE_SESSION",
+        payload: { ...activeSession, exercises: updatedExercises },
+      });
+    },
+    [activeSession, dispatch],
+  );
 
-  const handleSelectExercise = (exerciseId: string) => {
-    setCurrentExerciseId(exerciseId);
-  };
+  const handleDeleteSet = useCallback(
+    (exerciseId: string, setId: string) => {
+      if (!activeSession) return;
+      const updatedExercises = activeSession.exercises.map((ex) => {
+        if (ex.templateExerciseId === exerciseId) {
+          return { ...ex, sets: ex.sets.filter((s) => s.id !== setId) };
+        }
+        return ex;
+      });
+      dispatch({
+        type: "UPDATE_SESSION",
+        payload: { ...activeSession, exercises: updatedExercises },
+      });
+      // Remove from completed if it was there
+      setCompletedSets((prev) => {
+        const next = new Set(prev);
+        next.delete(setId);
+        return next;
+      });
+    },
+    [activeSession, dispatch],
+  );
 
-  const toggleNavigator = () => {
-    setIsNavigatorCollapsed((prev) => !prev);
-  };
+  const handleToggleSetComplete = useCallback(
+    (setId: string) => {
+      setCompletedSets((prev) => {
+        const next = new Set(prev);
+        if (next.has(setId)) {
+          next.delete(setId);
+        } else {
+          next.add(setId);
+          // Open rest timer when completing a set
+          restTimerRef.current?.open(90);
+        }
+        return next;
+      });
+    },
+    [],
+  );
 
-  const handleUpdateSet = (
-    exerciseId: string,
-    setId: string,
-    field: "reps" | "weight",
-    value: string,
-  ) => {
+  // ---------- Workout Actions ----------
+
+  const handleFinishWorkout = useCallback(() => {
     if (!activeSession) return;
 
-    const updatedExercises = activeSession.exercises.map((ex) => {
-      if (ex.templateExerciseId === exerciseId) {
-        return {
-          ...ex,
-          sets: ex.sets.map((s) =>
-            s.id === setId ? { ...s, [field]: value } : s,
-          ),
-        };
-      }
-      return ex;
-    });
-
-    dispatch({
-      type: "UPDATE_SESSION",
-      payload: { ...activeSession, exercises: updatedExercises },
-    });
-  };
-
-  const handleAddSet = (exerciseId: string) => {
-    if (!activeSession) return;
-
-    const updatedExercises = activeSession.exercises.map((ex) => {
-      if (ex.templateExerciseId === exerciseId) {
-        // Get the last set to copy values from
-        const lastSet = ex.sets[ex.sets.length - 1];
-        const newSet: SessionSet = {
-          id: Crypto.randomUUID(),
-          reps: lastSet?.reps || "",
-          weight: lastSet?.weight || "",
-        };
-        return {
-          ...ex,
-          sets: [...ex.sets, newSet],
-        };
-      }
-      return ex;
-    });
-
-    dispatch({
-      type: "UPDATE_SESSION",
-      payload: { ...activeSession, exercises: updatedExercises },
-    });
-  };
-
-  const handleDeleteSet = (exerciseId: string, setId: string) => {
-    if (!activeSession) return;
-
-    const updatedExercises = activeSession.exercises.map((ex) => {
-      if (ex.templateExerciseId === exerciseId) {
-        return {
-          ...ex,
-          sets: ex.sets.filter((s) => s.id !== setId),
-        };
-      }
-      return ex;
-    });
-
-    dispatch({
-      type: "UPDATE_SESSION",
-      payload: { ...activeSession, exercises: updatedExercises },
-    });
-  };
-
-  const handleFinishWorkout = () => {
-    if (!activeSession) return;
-
-    // Validate at least one exercise has been logged
     const loggedExercises = activeSession.exercises.filter((ex) =>
       ex.sets.some(
         (s) =>
@@ -155,7 +269,7 @@ export default function SessionScreen() {
 
     Alert.alert(
       "Finish Workout",
-      `Log ${loggedExercises.length} exercise${loggedExercises.length !== 1 ? "s" : ""}?`,
+      `Log ${loggedExercises.length} exercise${loggedExercises.length !== 1 ? "s" : ""} (${elapsedTime})?`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -163,6 +277,9 @@ export default function SessionScreen() {
           style: "default",
           onPress: async () => {
             try {
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success,
+              );
               const date = new Date().toISOString().split("T")[0];
               const exercisesData = loggedExercises.map((ex) => ({
                 name: ex.name,
@@ -182,14 +299,9 @@ export default function SessionScreen() {
                 activeSession.templateId,
               );
 
-              // End session
               dispatch({ type: "END_SESSION" });
-
-              Alert.alert("Success", "Workout logged successfully!", [
-                {
-                  text: "OK",
-                  onPress: () => router.push("/(tabs)"),
-                },
+              Alert.alert("Workout Complete!", "Great session. Keep it up.", [
+                { text: "OK", onPress: () => router.push("/(tabs)") },
               ]);
             } catch (error) {
               console.error("Error saving workout:", error);
@@ -199,9 +311,9 @@ export default function SessionScreen() {
         },
       ],
     );
-  };
+  }, [activeSession, dispatch, elapsedTime, router, saveWorkout]);
 
-  const handleCancelWorkout = () => {
+  const handleCancelWorkout = useCallback(() => {
     Alert.alert("Cancel Workout", "Are you sure? All progress will be lost.", [
       { text: "Keep Going", style: "cancel" },
       {
@@ -213,186 +325,205 @@ export default function SessionScreen() {
         },
       },
     ]);
-  };
+  }, [dispatch, router]);
 
-  // Empty state when no active session
+  // ---------- Empty State ----------
+
   if (!activeSession) {
     return (
       <StandardView style={styles.container}>
         <View
-          style={[styles.emptyStateContainer, { paddingTop: insets.top + 20 }]}
+          style={[styles.emptyStateContainer, { paddingTop: insets.top + 40 }]}
         >
-          <IconSymbol
-            size={80}
-            name="figure.strengthtraining.traditional"
-            color={colors.textTertiary}
-          />
-          <Text style={[styles.emptyTitle, { color: colors.textSecondary }]}>
-            No Active Session
-          </Text>
-          <Text style={[styles.emptySubtitle, { color: colors.textTertiary }]}>
-            Start a workout from the Home tab to begin tracking
-          </Text>
-          <PrimaryButton
-            title="Go to Home"
-            icon="house.fill"
-            onPress={() => router.push("/(tabs)")}
-            style={styles.startButton}
-          />
+          <Animated.View entering={FadeInDown.delay(100).springify()}>
+            <IconSymbol
+              size={80}
+              name="figure.strengthtraining.traditional"
+              color={colors.textTertiary}
+            />
+          </Animated.View>
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
+              No Active Session
+            </Text>
+          </Animated.View>
+          <Animated.View entering={FadeInDown.delay(300).springify()}>
+            <Text
+              style={[styles.emptySubtitle, { color: colors.textTertiary }]}
+            >
+              Start a workout from the Home tab or pick a template to begin
+              tracking your sets
+            </Text>
+          </Animated.View>
+          <Animated.View entering={FadeInDown.delay(400).springify()}>
+            <PrimaryButton
+              title="Go to Home"
+              icon="house.fill"
+              onPress={() => router.push("/(tabs)")}
+              style={styles.startButton}
+            />
+          </Animated.View>
         </View>
       </StandardView>
     );
   }
 
-  // Active session UI
-  const currentExercise = activeSession.exercises.find(
-    (ex) => ex.templateExerciseId === currentExerciseId,
+  // ---------- Active Session ----------
+
+  const totalSets = activeSession.exercises.reduce(
+    (sum, ex) => sum + ex.sets.length,
+    0,
+  );
+  const totalCompletedSets = activeSession.exercises.reduce(
+    (sum, ex) => sum + ex.sets.filter((s) => completedSets.has(s.id)).length,
+    0,
   );
 
-  const completedExercises = activeSession.exercises.filter((ex) =>
-    ex.sets.some(
-      (s) =>
-        s.reps && s.weight && parseFloat(s.weight) > 0 && parseInt(s.reps) > 0,
-    ),
-  ).length;
-
-  const duration = Math.floor(
-    (Date.now() - activeSession.startedAt) / 1000 / 60,
-  ); // minutes
+  const renderExercisePage = ({ item: exercise }: { item: typeof activeSession.exercises[number]; index: number }) => (
+    <View style={{ width: SCREEN_WIDTH }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 120 }}
+      >
+        <ExerciseDetail
+          exercise={exercise}
+          completedSets={completedSets}
+          onUpdateSet={(setId: string, field: "reps" | "weight", value: string) =>
+            handleUpdateSet(exercise.templateExerciseId, setId, field, value)
+          }
+          onAddSet={() => handleAddSet(exercise.templateExerciseId)}
+          onDeleteSet={(setId: string) =>
+            handleDeleteSet(exercise.templateExerciseId, setId)
+          }
+          onToggleSetComplete={handleToggleSetComplete}
+        />
+      </ScrollView>
+    </View>
+  );
 
   return (
-    <StandardView style={styles.container} padded={false}>
-      {/* Header */}
+    <GestureHandlerRootView style={styles.container}>
       <View
-        style={[
-          styles.header,
-          {
-            paddingTop: insets.top,
-            backgroundColor: colors.surface1,
-            borderBottomColor: colors.border,
-          },
-        ]}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <View style={styles.headerTop}>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity
-              onPress={toggleNavigator}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              style={styles.hamburgerButton}
-              accessibilityLabel="Toggle exercise list"
-              accessibilityHint="Shows or hides the exercise navigation panel"
-              accessibilityRole="button"
-            >
-              <IconSymbol
-                size={24}
-                name="line.3.horizontal"
-                color={colors.tint}
-              />
-            </TouchableOpacity>
+        {/* Header */}
+        <Animated.View
+          entering={FadeIn.duration(300)}
+          style={[
+            styles.header,
+            {
+              paddingTop: insets.top + 8,
+              backgroundColor: colors.surface1,
+              borderBottomColor: colors.border,
+            },
+          ]}
+        >
+          {/* Top row: Cancel — Template Name — Finish */}
+          <View style={styles.headerRow}>
             <TouchableOpacity
               onPress={handleCancelWorkout}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={styles.cancelButton}
             >
-              <Text style={[styles.cancelText, { color: colors.destructive }]}>
-                Cancel
-              </Text>
+              <IconSymbol size={18} name="xmark" color={colors.destructive} />
             </TouchableOpacity>
-          </View>
-          <View style={styles.headerCenter}>
-            <Text style={[styles.templateName, { color: colors.textPrimary }]}>
-              {activeSession.templateName}
-            </Text>
-            {/* 
-            
-            Storing this feature for now
 
-            <Text
-              style={[styles.progress, { color: isDark ? "#999" : "#666" }]}
-            >
-              {completedExercises} of {activeSession.exercises.length} exercises
-              • {duration} min
-            </Text> */}
-          </View>
-          <View style={styles.headerRight}>
+            <View style={styles.headerCenter}>
+              <Text
+                style={[styles.templateName, { color: colors.textPrimary }]}
+                numberOfLines={1}
+              >
+                {activeSession.templateName}
+              </Text>
+              <View style={styles.timerRow}>
+                <IconSymbol
+                  size={12}
+                  name="clock"
+                  color={colors.textTertiary}
+                />
+                <Text
+                  style={[styles.timerText, { color: colors.textSecondary }]}
+                >
+                  {elapsedTime}
+                </Text>
+                <Text style={[styles.dot, { color: colors.textTertiary }]}>
+                  ·
+                </Text>
+                <Text
+                  style={[styles.setsCount, { color: colors.textSecondary }]}
+                >
+                  {totalCompletedSets}/{totalSets} sets
+                </Text>
+              </View>
+            </View>
+
             <TouchableOpacity
               onPress={handleFinishWorkout}
               style={[styles.finishButton, { backgroundColor: colors.success }]}
             >
-              <Text style={styles.finishButtonText}>Finish</Text>
+              <IconSymbol size={14} name="checkmark" color="#FFFFFF" />
+              <Text style={styles.finishButtonText}>Done</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </View>
 
-      <View style={styles.content}>
-        {/* Exercise Navigator - Left Side */}
-        <View
-          style={[
-            styles.navigator,
-            isNavigatorCollapsed && styles.navigatorCollapsed,
-            { borderRightColor: colors.border },
-          ]}
+          {/* Progress Segments */}
+          <ProgressSegments
+            exercises={activeSession.exercises}
+            completedSets={completedSets}
+            colors={colors}
+          />
+        </Animated.View>
+
+        {/* Exercise Pill Bar */}
+        <ExercisePillBar
+          exercises={activeSession.exercises}
+          currentIndex={currentIndex}
+          onSelectExercise={scrollToIndex}
+        />
+
+        {/* Paged Exercise View */}
+        <KeyboardAvoidingView
+          style={styles.flexOne}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={insets.top + 140}
         >
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <ExerciseNavigator
-              exercises={activeSession.exercises}
-              currentExerciseId={currentExerciseId}
-              onSelectExercise={handleSelectExercise}
-              isCollapsed={isNavigatorCollapsed}
-            />
-          </ScrollView>
-        </View>
+          <FlatList
+            ref={flatListRef}
+            data={activeSession.exercises}
+            renderItem={renderExercisePage}
+            keyExtractor={(item) => item.templateExerciseId}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onViewableItemsChanged={onViewableItemsChanged}
+            viewabilityConfig={viewabilityConfig}
+            getItemLayout={(_, index) => ({
+              length: SCREEN_WIDTH,
+              offset: SCREEN_WIDTH * index,
+              index,
+            })}
+            initialScrollIndex={0}
+          />
+        </KeyboardAvoidingView>
 
-        {/* Exercise Detail - Right Side */}
-        <View style={styles.detail}>
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {currentExercise ? (
-              <ExerciseDetail
-                exercise={currentExercise}
-                onUpdateSet={(setId, field, value) =>
-                  handleUpdateSet(
-                    currentExercise.templateExerciseId,
-                    setId,
-                    field,
-                    value,
-                  )
-                }
-                onAddSet={() =>
-                  handleAddSet(currentExercise.templateExerciseId)
-                }
-                onDeleteSet={(setId) =>
-                  handleDeleteSet(currentExercise.templateExerciseId, setId)
-                }
-              />
-            ) : (
-              <View style={styles.exerciseEmptyState}>
-                <IconSymbol
-                  size={64}
-                  name="dumbbell"
-                  color={colors.textTertiary}
-                />
-                <Text
-                  style={[
-                    styles.exerciseEmptyText,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  Select an exercise to begin
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-        </View>
+        {/* Rest Timer Bottom Sheet */}
+        <RestTimerSheet ref={restTimerRef} />
       </View>
-    </StandardView>
+    </GestureHandlerRootView>
   );
 }
+
+// ---------- Styles ----------
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  // Empty state styles
+  flexOne: {
+    flex: 1,
+  },
+  // Empty state
   emptyStateContainer: {
     flex: 1,
     alignItems: "center",
@@ -400,93 +531,90 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   emptyTitle: {
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: 26,
+    fontWeight: "800",
     marginTop: 24,
     marginBottom: 8,
+    textAlign: "center",
   },
   emptySubtitle: {
-    fontSize: 16,
+    fontSize: 15,
     textAlign: "center",
     lineHeight: 22,
     marginBottom: 32,
   },
   startButton: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 28,
     borderRadius: 24,
   },
-  // Active session styles
+  // Header
   header: {
     borderBottomWidth: 1,
-    paddingBottom: 12,
-  },
-  headerTop: {
-    flexDirection: "row",
-    alignItems: "center",
+    paddingBottom: 10,
     paddingHorizontal: 16,
   },
-  headerLeft: {
-    minWidth: 70,
+  headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    marginBottom: 10,
   },
-  hamburgerButton: {
-    padding: 4,
+  cancelButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
   },
   headerCenter: {
     flex: 1,
     alignItems: "center",
   },
-  headerRight: {
-    minWidth: 70,
-    alignItems: "flex-end",
-  },
-  cancelText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
   templateName: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "700",
   },
-  progress: {
-    fontSize: 12,
+  timerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
     marginTop: 2,
   },
+  timerText: {
+    fontSize: 13,
+    fontWeight: "600",
+    fontVariant: ["tabular-nums"],
+  },
+  dot: {
+    fontSize: 13,
+  },
+  setsCount: {
+    fontSize: 13,
+    fontWeight: "500",
+  },
   finishButton: {
-    paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: 16,
+    borderRadius: 18,
   },
   finishButtonText: {
     color: "#fff",
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "700",
   },
-  content: {
-    flex: 1,
+});
+
+const progressStyles = StyleSheet.create({
+  container: {
     flexDirection: "row",
+    gap: 3,
+    paddingHorizontal: 4,
   },
-  navigator: {
-    width: "35%",
-    borderRightWidth: 1,
-    paddingVertical: 12,
-  },
-  navigatorCollapsed: {
-    width: "10%",
-  },
-  detail: {
+  segment: {
     flex: 1,
-  },
-  exerciseEmptyState: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 100,
-  },
-  exerciseEmptyText: {
-    fontSize: 16,
-    marginTop: 16,
+    height: 4,
+    borderRadius: 2,
   },
 });
