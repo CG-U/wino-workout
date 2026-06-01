@@ -7,11 +7,14 @@ import { ExercisePickerModal } from "@/components/WorkoutForm/ExercisePickerModa
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { createCompleteTemplate } from "@/lib/database/templateQueries";
-import React, { useState } from "react";
+import { WorkoutTemplateWithExercises } from "@/lib/database/schema";
+import {
+  createCompleteTemplate,
+  updateCompleteTemplate,
+} from "@/lib/database/templateQueries";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
-  FlatList,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -29,14 +32,18 @@ type Category = (typeof CATEGORIES)[number];
 
 interface CreateTemplateModalProps {
   visible: boolean;
+  mode?: "create" | "edit";
+  initialTemplate?: WorkoutTemplateWithExercises | null;
   onClose: () => void;
-  onCreated: () => void;
+  onSaved: () => void;
 }
 
 export function CreateTemplateModal({
   visible,
+  mode = "create",
+  initialTemplate,
   onClose,
-  onCreated,
+  onSaved,
 }: CreateTemplateModalProps) {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
@@ -52,15 +59,30 @@ export function CreateTemplateModal({
   const [showExercisePicker, setShowExercisePicker] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const resetForm = () => {
+  useEffect(() => {
+    if (!visible) return;
+
+    if (mode === "edit" && initialTemplate) {
+      setName(initialTemplate.name);
+      setCategory(initialTemplate.category);
+      setNotes(initialTemplate.notes || "");
+      setExercises(
+        initialTemplate.exercises.map((exercise) => ({
+          name: exercise.name,
+          notes: exercise.notes || "",
+        })),
+      );
+      return;
+    }
+
     setName("");
     setCategory("Custom");
     setNotes("");
     setExercises([]);
-  };
+  }, [visible, mode, initialTemplate]);
 
   const handleClose = () => {
-    resetForm();
+    setShowExercisePicker(false);
     onClose();
   };
 
@@ -89,12 +111,26 @@ export function CreateTemplateModal({
 
     setSaving(true);
     try {
-      await createCompleteTemplate(trimmedName, category, notes.trim(), exercises);
-      resetForm();
-      onCreated();
+      if (mode === "edit" && initialTemplate) {
+        await updateCompleteTemplate(
+          initialTemplate.id,
+          trimmedName,
+          category,
+          notes.trim(),
+          exercises,
+        );
+      } else {
+        await createCompleteTemplate(
+          trimmedName,
+          category,
+          notes.trim(),
+          exercises,
+        );
+      }
+      onSaved();
     } catch (error) {
-      console.error("Error creating template:", error);
-      Alert.alert("Error", "Failed to create template. Please try again.");
+      console.error("Error saving template:", error);
+      Alert.alert("Error", "Failed to save template. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -131,7 +167,7 @@ export function CreateTemplateModal({
             </Text>
           </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            New Template
+            {mode === "edit" ? "Edit Template" : "New Template"}
           </Text>
           <TouchableOpacity
             onPress={handleSave}

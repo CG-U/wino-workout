@@ -39,6 +39,8 @@ export default function TemplatesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<WorkoutTemplateWithExercises | null>(null);
 
   const loadTemplates = async () => {
     try {
@@ -63,11 +65,8 @@ export default function TemplatesScreen() {
   };
 
   const handleTemplatePress = (template: WorkoutTemplateWithExercises) => {
-    // TODO: Navigate to template detail/edit screen
-    Alert.alert(
-      template.name,
-      `${template.exercises.length} exercises\n\nExercises:\n${template.exercises.map((e) => `• ${e.name}`).join("\n")}`,
-    );
+    setSelectedTemplate(template);
+    setShowCreateModal(true);
   };
 
   const handleDeleteTemplate = (template: WorkoutTemplateWithExercises) => {
@@ -99,10 +98,12 @@ export default function TemplatesScreen() {
   };
 
   const handleCreateTemplate = () => {
+    setSelectedTemplate(null);
     setShowCreateModal(true);
   };
 
-  const handleTemplateCreated = () => {
+  const handleTemplateSaved = () => {
+    setSelectedTemplate(null);
     setShowCreateModal(false);
     loadTemplates();
   };
@@ -233,8 +234,13 @@ export default function TemplatesScreen() {
       {/* Create Template Modal */}
       <CreateTemplateModal
         visible={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onCreated={handleTemplateCreated}
+        mode={selectedTemplate ? "edit" : "create"}
+        initialTemplate={selectedTemplate}
+        onClose={() => {
+          setSelectedTemplate(null);
+          setShowCreateModal(false);
+        }}
+        onSaved={handleTemplateSaved}
       />
     </StandardView>
   );

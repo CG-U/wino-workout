@@ -290,3 +290,38 @@ export async function createCompleteTemplate(
     exercises: createdExercises,
   };
 }
+
+export async function updateCompleteTemplate(
+  id: string,
+  name: string,
+  category: "PPL" | "Bro Split" | "Full Body" | "Custom",
+  notes: string,
+  exercises: { name: string; notes?: string }[],
+): Promise<WorkoutTemplateWithExercises> {
+  const db = getDatabase();
+
+  await db.withTransactionAsync(async () => {
+    await updateWorkoutTemplate(id, name, category, notes);
+
+    // Replace exercises to keep ordering and names in sync with the form.
+    await db.runAsync(`DELETE FROM template_exercises WHERE template_id = ?`, [
+      id,
+    ]);
+
+    for (let i = 0; i < exercises.length; i++) {
+      await createTemplateExercise(
+        id,
+        exercises[i].name,
+        exercises[i].notes || "",
+        i,
+      );
+    }
+  });
+
+  const updated = await getWorkoutTemplateWithExercises(id);
+  if (!updated) {
+    throw new Error("Failed to load updated template");
+  }
+
+  return updated;
+}
