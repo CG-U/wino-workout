@@ -13,14 +13,9 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 interface TemplateCardProps {
   template: WorkoutTemplateWithExercises;
   onPress: () => void;
-  onDelete?: () => void;
 }
 
-export function TemplateCard({
-  template,
-  onPress,
-  onDelete,
-}: TemplateCardProps) {
+export function TemplateCard({ template, onPress }: TemplateCardProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const colors = Colors[isDark ? "dark" : "light"];
@@ -82,60 +77,23 @@ export function TemplateCard({
           </View>
 
           <View style={styles.textContent}>
-            <View style={styles.titleRow}>
-              <Text style={[styles.title, { color: colors.text }]}>
-                {template.name}
-              </Text>
-              {template.isDefault && (
-                <View
-                  style={[
-                    styles.badge,
-                    { backgroundColor: colors.tint + "20" },
-                  ]}
-                >
-                  <Text style={[styles.badgeText, { color: colors.tint }]}>
-                    DEFAULT
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.metaRow}>
-              <Text style={[styles.category, { color: getCategoryColor() }]}>
-                {template.category}
-              </Text>
-              <Text
-                style={[styles.separator, { color: isDark ? "#666" : "#999" }]}
-              >
-                •
-              </Text>
-              <Text
-                style={[
-                  styles.exerciseCount,
-                  { color: isDark ? "#999" : "#666" },
-                ]}
-              >
-                {template.exercises.length} exercise
-                {template.exercises.length !== 1 ? "s" : ""}
-              </Text>
-            </View>
+            <Text style={[styles.title, { color: colors.text }]}>
+              {template.name}
+            </Text>
+            <Text
+              style={[
+                styles.exerciseCount,
+                { color: isDark ? "#999" : "#666" },
+              ]}
+            >
+              {template.exercises.length} exercise
+              {template.exercises.length !== 1 ? "s" : ""}
+            </Text>
           </View>
         </View>
 
-        {/* Right side: Actions */}
+        {/* Right side */}
         <View style={styles.rightContent}>
-          {!template.isDefault && onDelete && (
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={(e) => {
-                e.stopPropagation();
-                onDelete();
-              }}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <IconSymbol size={20} name="trash" color="#FF3B30" />
-            </TouchableOpacity>
-          )}
           <IconSymbol size={20} name="chevron.right" color={colors.icon} />
         </View>
       </View>
@@ -173,37 +131,10 @@ const styles = StyleSheet.create({
   textContent: {
     flex: 1,
   },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-  },
   title: {
     fontSize: 16,
     fontWeight: "600",
-    marginRight: 8,
-  },
-  badge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  category: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  separator: {
-    marginHorizontal: 6,
-    fontSize: 12,
+    marginBottom: 4,
   },
   exerciseCount: {
     fontSize: 13,
@@ -211,9 +142,6 @@ const styles = StyleSheet.create({
   rightContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-  },
-  deleteButton: {
-    padding: 4,
+    justifyContent: "center",
   },
 });
