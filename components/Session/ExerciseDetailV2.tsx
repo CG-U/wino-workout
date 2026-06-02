@@ -133,10 +133,7 @@ export function ExerciseDetail({
                 ]}
               >
                 <Text
-                  style={[
-                    styles.lastSetText,
-                    { color: colors.textSecondary },
-                  ]}
+                  style={[styles.lastSetText, { color: colors.textSecondary }]}
                 >
                   {s.weight}kg × {s.reps}
                 </Text>
@@ -151,11 +148,7 @@ export function ExerciseDetail({
         <View
           style={[styles.notesContainer, { backgroundColor: colors.surface2 }]}
         >
-          <IconSymbol
-            size={12}
-            name="note.text"
-            color={colors.textTertiary}
-          />
+          <IconSymbol size={12} name="note.text" color={colors.textTertiary} />
           <Text style={[styles.notesText, { color: colors.textSecondary }]}>
             {exercise.notes}
           </Text>

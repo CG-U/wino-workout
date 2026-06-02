@@ -18,7 +18,6 @@ import {
   View,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
-import Animated from "react-native-reanimated";
 
 interface SetCardProps {
   set: SessionSet;
@@ -98,7 +97,9 @@ export function SetCard({
         style={[
           styles.card,
           {
-            backgroundColor: isCompleted ? colors.successSubtle : colors.surface1,
+            backgroundColor: isCompleted
+              ? colors.successSubtle
+              : colors.surface1,
             borderColor: isCompleted ? colors.success : colors.border,
           },
         ]}
@@ -110,9 +111,7 @@ export function SetCard({
             style={[
               styles.completeButton,
               {
-                backgroundColor: isCompleted
-                  ? colors.success
-                  : colors.surface3,
+                backgroundColor: isCompleted ? colors.success : colors.surface3,
                 borderColor: isCompleted ? colors.success : colors.border,
               },
             ]}
@@ -120,9 +119,7 @@ export function SetCard({
             {isCompleted ? (
               <IconSymbol size={16} name="checkmark" color="#FFFFFF" />
             ) : (
-              <Text
-                style={[styles.setNumber, { color: colors.textSecondary }]}
-              >
+              <Text style={[styles.setNumber, { color: colors.textSecondary }]}>
                 {index + 1}
               </Text>
             )}
@@ -141,7 +138,10 @@ export function SetCard({
                 onPress={() => handleDecrement("weight")}
                 style={[
                   styles.stepper,
-                  { backgroundColor: colors.surface2, borderColor: colors.border },
+                  {
+                    backgroundColor: colors.surface2,
+                    borderColor: colors.border,
+                  },
                 ]}
                 disabled={isCompleted}
               >
@@ -158,9 +158,7 @@ export function SetCard({
                     backgroundColor: isCompleted
                       ? "transparent"
                       : colors.surface2,
-                    borderColor: isCompleted
-                      ? colors.success
-                      : colors.border,
+                    borderColor: isCompleted ? colors.success : colors.border,
                     color: colors.textPrimary,
                   },
                 ]}
@@ -175,7 +173,10 @@ export function SetCard({
                 onPress={() => handleIncrement("weight")}
                 style={[
                   styles.stepper,
-                  { backgroundColor: colors.surface2, borderColor: colors.border },
+                  {
+                    backgroundColor: colors.surface2,
+                    borderColor: colors.border,
+                  },
                 ]}
                 disabled={isCompleted}
               >
@@ -198,7 +199,10 @@ export function SetCard({
                 onPress={() => handleDecrement("reps")}
                 style={[
                   styles.stepper,
-                  { backgroundColor: colors.surface2, borderColor: colors.border },
+                  {
+                    backgroundColor: colors.surface2,
+                    borderColor: colors.border,
+                  },
                 ]}
                 disabled={isCompleted}
               >
@@ -215,9 +219,7 @@ export function SetCard({
                     backgroundColor: isCompleted
                       ? "transparent"
                       : colors.surface2,
-                    borderColor: isCompleted
-                      ? colors.success
-                      : colors.border,
+                    borderColor: isCompleted ? colors.success : colors.border,
                     color: colors.textPrimary,
                   },
                 ]}
@@ -232,7 +234,10 @@ export function SetCard({
                 onPress={() => handleIncrement("reps")}
                 style={[
                   styles.stepper,
-                  { backgroundColor: colors.surface2, borderColor: colors.border },
+                  {
+                    backgroundColor: colors.surface2,
+                    borderColor: colors.border,
+                  },
                 ]}
                 disabled={isCompleted}
               >
@@ -250,14 +255,10 @@ export function SetCard({
         <View style={styles.volumeSection}>
           {volume ? (
             <>
-              <Text
-                style={[styles.volumeValue, { color: colors.textPrimary }]}
-              >
+              <Text style={[styles.volumeValue, { color: colors.textPrimary }]}>
                 {volume}
               </Text>
-              <Text
-                style={[styles.volumeUnit, { color: colors.textTertiary }]}
-              >
+              <Text style={[styles.volumeUnit, { color: colors.textTertiary }]}>
                 kg
               </Text>
             </>

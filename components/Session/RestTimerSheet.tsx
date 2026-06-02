@@ -39,237 +39,230 @@ interface RestTimerSheetProps {
   onTimerComplete?: () => void;
 }
 
-export const RestTimerSheet = forwardRef<RestTimerSheetRef, RestTimerSheetProps>(
-  ({ onTimerComplete }, ref) => {
-    const colorScheme = useColorScheme();
-    const isDark = colorScheme === "dark";
-    const colors = Colors[isDark ? "dark" : "light"];
+export const RestTimerSheet = forwardRef<
+  RestTimerSheetRef,
+  RestTimerSheetProps
+>(({ onTimerComplete }, ref) => {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const colors = Colors[isDark ? "dark" : "light"];
 
-    const bottomSheetRef = useRef<BottomSheet>(null);
-    const snapPoints = useMemo(() => ["45%"], []);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["45%"], []);
 
-    const [isActive, setIsActive] = useState(false);
-    const [totalDuration, setTotalDuration] = useState(90);
-    const [remainingTime, setRemainingTime] = useState(90);
-    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const [totalDuration, setTotalDuration] = useState(90);
+  const [remainingTime, setRemainingTime] = useState(90);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    const progress = useSharedValue(1);
+  const progress = useSharedValue(1);
 
-    // Circle dimensions
-    const size = 180;
-    const strokeWidth = 8;
-    const radius = (size - strokeWidth) / 2;
-    const circumference = 2 * Math.PI * radius;
+  // Circle dimensions
+  const size = 180;
+  const strokeWidth = 8;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
 
-    const animatedProps = useAnimatedProps(() => ({
-      strokeDashoffset: circumference * (1 - progress.value),
-    }));
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: circumference * (1 - progress.value),
+  }));
 
-    const startTimer = useCallback(
-      (duration: number) => {
-        setTotalDuration(duration);
-        setRemainingTime(duration);
-        setIsActive(true);
-        progress.value = 1;
-        progress.value = withTiming(0, {
-          duration: duration * 1000,
-          easing: Easing.linear,
+  const startTimer = useCallback(
+    (duration: number) => {
+      setTotalDuration(duration);
+      setRemainingTime(duration);
+      setIsActive(true);
+      progress.value = 1;
+      progress.value = withTiming(0, {
+        duration: duration * 1000,
+        easing: Easing.linear,
+      });
+    },
+    [progress, circumference],
+  );
+
+  const stopTimer = useCallback(() => {
+    setIsActive(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isActive && remainingTime > 0) {
+      intervalRef.current = setInterval(() => {
+        setRemainingTime((prev) => {
+          if (prev <= 1) {
+            stopTimer();
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            onTimerComplete?.();
+            return 0;
+          }
+          return prev - 1;
         });
-      },
-      [progress, circumference],
-    );
-
-    const stopTimer = useCallback(() => {
-      setIsActive(false);
+      }, 1000);
+    }
+    return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-    }, []);
+    };
+  }, [isActive, stopTimer, onTimerComplete]);
 
-    useEffect(() => {
-      if (isActive && remainingTime > 0) {
-        intervalRef.current = setInterval(() => {
-          setRemainingTime((prev) => {
-            if (prev <= 1) {
-              stopTimer();
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
-              onTimerComplete?.();
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-      }
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-      };
-    }, [isActive, stopTimer, onTimerComplete]);
-
-    useImperativeHandle(ref, () => ({
-      open: (duration = 90) => {
-        bottomSheetRef.current?.snapToIndex(0);
-        startTimer(duration);
-      },
-      close: () => {
-        stopTimer();
-        bottomSheetRef.current?.close();
-      },
-    }));
-
-    const handleClose = useCallback(() => {
+  useImperativeHandle(ref, () => ({
+    open: (duration = 90) => {
+      bottomSheetRef.current?.snapToIndex(0);
+      startTimer(duration);
+    },
+    close: () => {
       stopTimer();
-    }, [stopTimer]);
+      bottomSheetRef.current?.close();
+    },
+  }));
 
-    const handleAddTime = (seconds: number) => {
-      const newDuration = remainingTime + seconds;
-      setRemainingTime(newDuration);
-      setTotalDuration((prev) => prev + seconds);
-      progress.value = withTiming(newDuration / (totalDuration + seconds), {
-        duration: 300,
-      });
-    };
+  const handleClose = useCallback(() => {
+    stopTimer();
+  }, [stopTimer]);
 
-    const handleSelectPreset = (seconds: number) => {
-      stopTimer();
-      startTimer(seconds);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    };
+  const handleAddTime = (seconds: number) => {
+    const newDuration = remainingTime + seconds;
+    setRemainingTime(newDuration);
+    setTotalDuration((prev) => prev + seconds);
+    progress.value = withTiming(newDuration / (totalDuration + seconds), {
+      duration: 300,
+    });
+  };
 
-    const formatTime = (seconds: number) => {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${mins}:${secs.toString().padStart(2, "0")}`;
-    };
+  const handleSelectPreset = (seconds: number) => {
+    stopTimer();
+    startTimer(seconds);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
-    const renderBackdrop = useCallback(
-      (props: any) => (
-        <BottomSheetBackdrop
-          {...props}
-          disappearsOnIndex={-1}
-          appearsOnIndex={0}
-          opacity={0.5}
-        />
-      ),
-      [],
-    );
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
 
-    return (
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        onClose={handleClose}
-        backdropComponent={renderBackdrop}
-        backgroundStyle={{ backgroundColor: colors.surface1 }}
-        handleIndicatorStyle={{ backgroundColor: colors.textTertiary }}
-      >
-        <View style={styles.content}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>
-            Rest Timer
-          </Text>
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+      />
+    ),
+    [],
+  );
 
-          {/* Circular Timer */}
-          <View style={styles.timerContainer}>
-            <Svg width={size} height={size} style={styles.svg}>
-              {/* Background circle */}
-              <Circle
-                cx={size / 2}
-                cy={size / 2}
-                r={radius}
-                stroke={colors.surface3}
-                strokeWidth={strokeWidth}
-                fill="none"
-              />
-              {/* Progress circle */}
-              <AnimatedCircle
-                cx={size / 2}
-                cy={size / 2}
-                r={radius}
-                stroke={colors.accent}
-                strokeWidth={strokeWidth}
-                fill="none"
-                strokeDasharray={circumference}
-                animatedProps={animatedProps}
-                strokeLinecap="round"
-                rotation="-90"
-                origin={`${size / 2}, ${size / 2}`}
-              />
-            </Svg>
-            <View style={styles.timerTextContainer}>
-              <Text style={[styles.timerText, { color: colors.textPrimary }]}>
-                {formatTime(remainingTime)}
+  return (
+    <BottomSheet
+      ref={bottomSheetRef}
+      index={-1}
+      snapPoints={snapPoints}
+      enablePanDownToClose
+      onClose={handleClose}
+      backdropComponent={renderBackdrop}
+      backgroundStyle={{ backgroundColor: colors.surface1 }}
+      handleIndicatorStyle={{ backgroundColor: colors.textTertiary }}
+    >
+      <View style={styles.content}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>
+          Rest Timer
+        </Text>
+
+        {/* Circular Timer */}
+        <View style={styles.timerContainer}>
+          <Svg width={size} height={size} style={styles.svg}>
+            {/* Background circle */}
+            <Circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke={colors.surface3}
+              strokeWidth={strokeWidth}
+              fill="none"
+            />
+            {/* Progress circle */}
+            <AnimatedCircle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              stroke={colors.accent}
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeDasharray={circumference}
+              animatedProps={animatedProps}
+              strokeLinecap="round"
+              rotation="-90"
+              origin={`${size / 2}, ${size / 2}`}
+            />
+          </Svg>
+          <View style={styles.timerTextContainer}>
+            <Text style={[styles.timerText, { color: colors.textPrimary }]}>
+              {formatTime(remainingTime)}
+            </Text>
+            {remainingTime === 0 && (
+              <Text style={[styles.timerDoneText, { color: colors.success }]}>
+                Done!
               </Text>
-              {remainingTime === 0 && (
-                <Text
-                  style={[styles.timerDoneText, { color: colors.success }]}
-                >
-                  Done!
-                </Text>
-              )}
-            </View>
+            )}
           </View>
+        </View>
 
-          {/* Preset Buttons */}
-          <View style={styles.presetRow}>
-            {TIMER_PRESETS.map((preset) => (
-              <TouchableOpacity
-                key={preset}
+        {/* Preset Buttons */}
+        <View style={styles.presetRow}>
+          {TIMER_PRESETS.map((preset) => (
+            <TouchableOpacity
+              key={preset}
+              style={[
+                styles.presetButton,
+                {
+                  backgroundColor:
+                    totalDuration === preset
+                      ? colors.accentSubtle
+                      : colors.surface2,
+                  borderColor:
+                    totalDuration === preset ? colors.accent : colors.border,
+                },
+              ]}
+              onPress={() => handleSelectPreset(preset)}
+            >
+              <Text
                 style={[
-                  styles.presetButton,
+                  styles.presetText,
                   {
-                    backgroundColor:
-                      totalDuration === preset
-                        ? colors.accentSubtle
-                        : colors.surface2,
-                    borderColor:
+                    color:
                       totalDuration === preset
                         ? colors.accent
-                        : colors.border,
+                        : colors.textSecondary,
                   },
                 ]}
-                onPress={() => handleSelectPreset(preset)}
               >
-                <Text
-                  style={[
-                    styles.presetText,
-                    {
-                      color:
-                        totalDuration === preset
-                          ? colors.accent
-                          : colors.textSecondary,
-                    },
-                  ]}
-                >
-                  {formatTime(preset)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Add Time Button */}
-          <TouchableOpacity
-            style={[styles.addTimeButton, { backgroundColor: colors.surface2 }]}
-            onPress={() => handleAddTime(30)}
-          >
-            <IconSymbol size={16} name="plus" color={colors.textSecondary} />
-            <Text
-              style={[styles.addTimeText, { color: colors.textSecondary }]}
-            >
-              +30s
-            </Text>
-          </TouchableOpacity>
+                {formatTime(preset)}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      </BottomSheet>
-    );
-  },
-);
+
+        {/* Add Time Button */}
+        <TouchableOpacity
+          style={[styles.addTimeButton, { backgroundColor: colors.surface2 }]}
+          onPress={() => handleAddTime(30)}
+        >
+          <IconSymbol size={16} name="plus" color={colors.textSecondary} />
+          <Text style={[styles.addTimeText, { color: colors.textSecondary }]}>
+            +30s
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </BottomSheet>
+  );
+});
 
 const styles = StyleSheet.create({
   content: {

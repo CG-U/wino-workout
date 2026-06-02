@@ -264,9 +264,7 @@ function WorkoutCard({
         ]}
       >
         {/* Left accent strip */}
-        <View
-          style={[styles.accentStrip, { backgroundColor: accentColor }]}
-        />
+        <View style={[styles.accentStrip, { backgroundColor: accentColor }]} />
 
         <View style={styles.cardInner}>
           {/* Header row */}
@@ -311,9 +309,7 @@ function WorkoutCard({
                     style={[
                       styles.volumeIndicatorText,
                       {
-                        color: volumeUp
-                          ? colors.success
-                          : colors.destructive,
+                        color: volumeUp ? colors.success : colors.destructive,
                       },
                     ]}
                   >
@@ -331,10 +327,7 @@ function WorkoutCard({
               style={[styles.statPill, { backgroundColor: colors.surface2 }]}
             >
               <Text
-                style={[
-                  styles.statPillText,
-                  { color: colors.textSecondary },
-                ]}
+                style={[styles.statPillText, { color: colors.textSecondary }]}
               >
                 {workout.exerciseCount} exercise
                 {workout.exerciseCount !== 1 ? "s" : ""}
@@ -344,15 +337,9 @@ function WorkoutCard({
               style={[styles.statPill, { backgroundColor: colors.surface2 }]}
             >
               <Text
-                style={[
-                  styles.statPillText,
-                  { color: colors.textSecondary },
-                ]}
+                style={[styles.statPillText, { color: colors.textSecondary }]}
               >
-                {workout.exercises.reduce(
-                  (sum, e) => sum + e.sets.length,
-                  0,
-                )}{" "}
+                {workout.exercises.reduce((sum, e) => sum + e.sets.length, 0)}{" "}
                 sets
               </Text>
             </View>
@@ -380,9 +367,7 @@ function WorkoutCard({
                     { borderTopColor: colors.border },
                   ]}
                 >
-                  <Text
-                    style={[styles.notes, { color: colors.textSecondary }]}
-                  >
+                  <Text style={[styles.notes, { color: colors.textSecondary }]}>
                     &ldquo;{workout.notes}&rdquo;
                   </Text>
                 </View>

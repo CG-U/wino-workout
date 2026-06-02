@@ -27,7 +27,6 @@ import {
   Dimensions,
   FlatList,
   KeyboardAvoidingView,
-  LayoutAnimation,
   Platform,
   ScrollView,
   StyleSheet,
@@ -38,13 +37,7 @@ import {
   ViewToken,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, {
-  FadeIn,
-  FadeInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Enable LayoutAnimation on Android
@@ -108,10 +101,7 @@ function ProgressSegments({
         return (
           <View
             key={ex.templateExerciseId}
-            style={[
-              progressStyles.segment,
-              { backgroundColor: segmentColor },
-            ]}
+            style={[progressStyles.segment, { backgroundColor: segmentColor }]}
           />
         );
       })}
@@ -160,7 +150,12 @@ export default function SessionScreen() {
   // ---------- Set Operations ----------
 
   const handleUpdateSet = useCallback(
-    (exerciseId: string, setId: string, field: "reps" | "weight", value: string) => {
+    (
+      exerciseId: string,
+      setId: string,
+      field: "reps" | "weight",
+      value: string,
+    ) => {
       if (!activeSession) return;
       const updatedExercises = activeSession.exercises.map((ex) => {
         if (ex.templateExerciseId === exerciseId) {
@@ -227,22 +222,19 @@ export default function SessionScreen() {
     [activeSession, dispatch],
   );
 
-  const handleToggleSetComplete = useCallback(
-    (setId: string) => {
-      setCompletedSets((prev) => {
-        const next = new Set(prev);
-        if (next.has(setId)) {
-          next.delete(setId);
-        } else {
-          next.add(setId);
-          // Open rest timer when completing a set
-          restTimerRef.current?.open(90);
-        }
-        return next;
-      });
-    },
-    [],
-  );
+  const handleToggleSetComplete = useCallback((setId: string) => {
+    setCompletedSets((prev) => {
+      const next = new Set(prev);
+      if (next.has(setId)) {
+        next.delete(setId);
+      } else {
+        next.add(setId);
+        // Open rest timer when completing a set
+        restTimerRef.current?.open(90);
+      }
+      return next;
+    });
+  }, []);
 
   // ---------- Workout Actions ----------
 
@@ -379,7 +371,12 @@ export default function SessionScreen() {
     0,
   );
 
-  const renderExercisePage = ({ item: exercise }: { item: typeof activeSession.exercises[number]; index: number }) => (
+  const renderExercisePage = ({
+    item: exercise,
+  }: {
+    item: (typeof activeSession.exercises)[number];
+    index: number;
+  }) => (
     <View style={{ width: SCREEN_WIDTH }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -389,7 +386,11 @@ export default function SessionScreen() {
         <ExerciseDetail
           exercise={exercise}
           completedSets={completedSets}
-          onUpdateSet={(setId: string, field: "reps" | "weight", value: string) =>
+          onUpdateSet={(
+            setId: string,
+            field: "reps" | "weight",
+            value: string,
+          ) =>
             handleUpdateSet(exercise.templateExerciseId, setId, field, value)
           }
           onAddSet={() => handleAddSet(exercise.templateExerciseId)}
@@ -404,9 +405,7 @@ export default function SessionScreen() {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <View
-        style={[styles.container, { backgroundColor: colors.background }]}
-      >
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         {/* Header */}
         <Animated.View
           entering={FadeIn.duration(300)}
